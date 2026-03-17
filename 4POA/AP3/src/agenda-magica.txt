@@ -1,0 +1,3 @@
+Merlin;Nvl 9
+Hermione;Nvl 4
+Harry;Nvl 6

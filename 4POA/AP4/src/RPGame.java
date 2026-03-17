@@ -67,9 +67,11 @@ public class RPGame {
         }
 
         // 5. CONTINUANDO APÓS O RESPAWN
-        System.out.println("\n--- TENTATIVA 2 ---\n");
-        ignis.addSkill("Estratégia de Recuo");
-        System.out.println(ignis.getNome() + " e " + froze.getNome() + " decidiram fugir desta vez.");
+        if (froze != null) {
+            System.out.println(ignis.getNome() + " e " + froze.getNome() + " decidiram fugir desta vez.");
+        } else {
+            System.out.println(ignis.getNome() + " tentou fugir sozinho.");
+        }
     }
 
     // Método auxiliar para organizar a Serialização
@@ -81,11 +83,11 @@ public class RPGame {
             System.err.println("Falha ao salvar: " + e.getMessage());
         }
     }
-    
+
     // Método auxiliar para facilitar a visualização no console
     public static void exibirStatus(Mago mago) {
         System.out.println("Mago: " + mago.getNome() + 
-                           " | Nível: " + mago.getNivel() + 
-                           " | Skills: " + mago.getSkills());
+                        " | Nível: " + mago.getNivel() + 
+                        " | Skills: " + mago.getSkills());
     }
 }

@@ -1,0 +1,56 @@
+body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #1a1a2e;
+        color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .card {
+        background-color: #16213e;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+        border-top: 5px solid #a27bfe;
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+    }
+    h1 {
+        color: #a27bfe;
+        margin-bottom: 30px;
+    }
+    .atributo {
+        background-color: #0f1a2c;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        border-left: 4px solid #4a69bd;
+    }
+    .atributo strong {
+        color: #c8d6e5;
+    }
+    .atributo span {
+        color: #00d2d3;
+        font-weight: bold;
+    }
+    .voltar-btn {
+        display: inline-block;
+        margin-top: 25px;
+        padding: 10px 20px;
+        background-color: transparent;
+        color: #a27bfe;
+        text-decoration: none;
+        border: 2px solid #a27bfe;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    .voltar-btn:hover {
+        background-color: #a27bfe;
+        color: #1a1a2e;
+    }

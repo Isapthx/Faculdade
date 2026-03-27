@@ -28,3 +28,5 @@ Pensando no futuro, a tendência é uma internet cada vez mais **descentralizada
 Ou seja, o Edge Computing vai ser fundamental para tecnologias como robótica, Internet das Coisas e automação.
 
 E é por isso que ele é tão importante hoje.
+
+Por exemplo, um estudo da McKinsey & Company descobriu que uma plataforma petrolífera offshore gera dados com 30.000 sensores, mas menos de 1% desses dados é usado ativamente para determinar ações

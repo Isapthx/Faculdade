@@ -26,6 +26,11 @@
                 <label><input type="checkbox" name="elementos" value="Água" class="elemento-chk"> Água 💧</label>
                 <label><input type="checkbox" name="elementos" value="Terra" class="elemento-chk"> Terra 🪨</label>
                 <label><input type="checkbox" name="elementos" value="Ar" class="elemento-chk"> Ar 🌪️</label>
+                <label for="mana">Nível de Mana (0 a 100):</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="mana" name="mana" min="0" max="100" value="50" class="range-input">
+                    <span id="valor-mana">50</span>
+                </div>
             </div>
             
             <button type="submit">Realizar Invocação!</button>

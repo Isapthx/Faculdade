@@ -20,3 +20,10 @@ const checkboxes = document.querySelectorAll('.elemento-chk');
             });
         });
     });
+
+const manaInput = document.getElementById('mana');
+const manaValue = document.getElementById('valor-mana');
+
+manaInput.addEventListener('input', () => {
+    manaValue.textContent = manaInput.value;
+});

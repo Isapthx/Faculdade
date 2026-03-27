@@ -17,6 +17,10 @@
     <div class="atributo">
         <strong>Nível:</strong> <span>${magoGerado.nivel}</span>
     </div>
+
+    <div class="atributo">
+        <strong>Mana:</strong> <span>${magoGerado.mana}</span>
+    </div>
     
     <div class="atributo">
         <strong>Elementos:</strong> <span>${magoGerado.elementos}</span>

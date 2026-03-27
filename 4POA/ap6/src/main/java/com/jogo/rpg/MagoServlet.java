@@ -1,12 +1,13 @@
 package com.jogo.rpg;
 
+import java.io.IOException;
+
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 // Mapeia a URL que colocamos no "action" do formulário
 @WebServlet("/cadastrarMago")
@@ -18,7 +19,8 @@ public class MagoServlet extends HttpServlet {
         
         // dados da requisição
         String nome = request.getParameter("nomeMago");
-        int nivel = Integer.parseInt(request.getParameter("nivelInicial"));
+        String nivelStr = request.getParameter("nivelInicial");
+        String manaStr = request.getParameter("mana");
         String[] elementosSelecionados = request.getParameterValues("elementos");
         String elemento = "";
 
@@ -29,8 +31,17 @@ public class MagoServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Um mago não pode ter mais de um ou nenhum elemento inicial.");
         }
 
+        int nivel = 1;
+        int mana = 50;
+        try {
+            nivel = Integer.parseInt(nivelStr);
+            mana = Integer.parseInt(manaStr);
+        } catch (NumberFormatException e) {
+            // Se der erro na conversão, mantém os valores padrão
+        }
+
         // Instanciando objeto mago
-        Mago novoMago = new Mago(nome, nivel, elemento);
+        Mago novoMago = new Mago(nome, nivel, mana, elemento);
 
         // Inserindo o objeto do mago criado na requisição do formulário
         request.setAttribute("magoGerado", novoMago);

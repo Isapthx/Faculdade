@@ -1,0 +1,30 @@
+“Bom, agora eu vou falar sobre **Edge Computing**.
+
+Primeiro, o que é isso?
+
+Edge Computing é um modelo de computação onde o processamento dos dados acontece mais próximo de onde eles são gerados, ou seja, perto dos dispositivos 
+— como sensores, câmeras ou robôs — em vez de enviar tudo para a nuvem.
+
+Mas por que isso é importante?
+
+Porque a nuvem nem sempre é a melhor solução. Quando os dados precisam viajar até servidores distantes, isso pode causar **atrasos**, consumo de banda e até riscos de segurança. 
+Em aplicações que precisam de respostas rápidas, isso pode ser um problema sério.
+
+E é aí que entra o Edge Computing: ele permite respostas em tempo real, com mais eficiência e menor dependência da internet.
+
+Agora, alguns exemplos práticos:
+
+Um deles são as cidades inteligentes, que usam sensores e dispositivos conectados para melhorar trânsito, iluminação e serviços urbanos. 
+Com Edge Computing, esses dados podem ser processados localmente, tornando as decisões mais rápidas.
+
+Outro exemplo são os carros autônomos. Eles precisam tomar decisões em frações de segundo — como frear ou desviar de obstáculos — e não podem depender de uma conexão com a nuvem. 
+O processamento precisa acontecer no próprio veículo.
+
+Além disso, temos a questão da segurança de dados. Quando os dados são processados localmente, há menos necessidade de transmiti-los pela internet, 
+o que reduz o risco de interceptação e aumenta a privacidade.
+
+Pensando no futuro, a tendência é uma internet cada vez mais **descentralizada**, com mais dispositivos inteligentes processando dados em tempo real.
+
+Ou seja, o Edge Computing vai ser fundamental para tecnologias como robótica, Internet das Coisas e automação.
+
+E é por isso que ele é tão importante hoje.

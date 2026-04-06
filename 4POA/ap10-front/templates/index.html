@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Matriz e Ementas - FAETERJ</title>
+
+<link rel="stylesheet" th:href="@{/css/index.css}">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="header-container">
+
+<h2>FAETERJ - Rio</h2>
+
+<nav>
+
+<a href="#">Início</a>
+<a href="#">Matriz</a>
+<a href="#">Ementas</a>
+<a href="#">Contato</a>
+
+</nav>
+
+</div>
+
+</header>
+
+<main>
+
+<section class="container">
+
+<h1>Matriz / Ementas</h1>
+
+<p class="descricao">
+Selecione uma das opções abaixo para visualizar as informações do curso.
+</p>
+
+<div class="opcoes">
+
+<div class="card" onclick="abrirMatriz()">
+<h3>Matriz 2018</h3>
+<p>Visualizar matriz curricular</p>
+</div>
+
+<div class="card" onclick="abrirEmentas()">
+<h3>Ementário</h3>
+<p>Consultar ementas das disciplinas</p>
+</div>
+
+<div class="card" onclick="abrirMatrizDescrita()">
+<h3>Matriz Descrita</h3>
+<p>Visualizar matriz detalhada</p>
+</div>
+
+<div class="card" onclick="abrirPdf()">
+<h3>PDF Completo</h3>
+<p>Baixar documento completo</p>
+</div>
+
+</div>
+
+</section>
+
+<section class="resultado">
+
+<h2>Resultado</h2>
+
+<div id="conteudo">
+
+<!-- Backend vai preencher aqui -->
+
+<div th:if="${disciplinas != null}">
+
+<div th:each="disciplina : ${disciplinas}" class="disciplina">
+
+<h3 th:text="${disciplina.nome}"></h3>
+
+<p th:text="${disciplina.ementa}"></p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<footer>
+
+<p>FAETERJ - Faculdade de Educação Tecnológica do Estado do Rio de Janeiro</p>
+
+</footer>
+
+<script th:src="@{/js/script.js}"></script>
+
+</body>
+
+</html>

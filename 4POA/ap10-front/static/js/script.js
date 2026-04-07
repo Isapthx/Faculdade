@@ -1,44 +1,35 @@
-function abrirMatriz(){
+// Função que busca os dados da sua API Java
+async function carregarDisciplinas() {
+    try {
+        const resposta = await fetch('http://localhost:8080/api/disciplinas');
+        const disciplinas = await resposta.json();
 
-fetch("/matriz")
-.then(response => response.text())
-.then(data => {
+        const container = document.getElementById('container-cards');
+        container.innerHTML = ''; // Limpa o "Carregando..."
 
-document.getElementById("conteudo").innerHTML = data;
+        if (disciplinas.length === 0) {
+            container.innerHTML = '<p>Nenhuma disciplina encontrada.</p>';
+            return;
+        }
 
-})
-.catch(error => console.error("Erro:", error));
-
+        disciplinas.forEach(disc => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = 
+                <><h3>${disc.nome}</h3><p><strong>Período:</strong> ${disc.periodo}º</p><p>⭐ Dificuldade: ${disc.dificuldadeMedia.toFixed(1)}</p><button onclick="verDetalhes(${disc.id})">Ver Conteúdos</button></>
+            ;
+            container.appendChild(card);
+        });
+    } catch (erro) {
+        console.error("Erro ao buscar disciplinas:", erro);
+        document.getElementById('container-cards').innerHTML = '<p>Erro ao conectar com o servidor.</p>';
+    }
 }
 
-function abrirEmentas(){
-
-fetch("/ementas")
-.then(response => response.text())
-.then(data => {
-
-document.getElementById("conteudo").innerHTML = data;
-
-})
-.catch(error => console.error("Erro:", error));
-
+function verDetalhes(id) {
+    alert("Em breve: Detalhes da disciplina " + id);
+    // Aqui você redirecionaria para uma página de detalhes
 }
 
-function abrirMatrizDescrita(){
-
-fetch("/matriz-descrita")
-.then(response => response.text())
-.then(data => {
-
-document.getElementById("conteudo").innerHTML = data;
-
-})
-.catch(error => console.error("Erro:", error));
-
-}
-
-function abrirPdf(){
-
-window.open("/pdf", "_blank");
-
-}
+// Executa assim que a página abre
+carregarDisciplinas();

@@ -65,7 +65,7 @@ async function initHome() {
 
     } catch (error) {
         container.innerHTML = '<p class="erro">Erro ao carregar dados do servidor.</p>';
-        console.error(error);
+        console.error('Erro ao carregar dados: ', error);
     }
 }
 

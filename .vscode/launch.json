@@ -2,6 +2,12 @@
     "configurations": [
         {
             "type": "java",
+            "name": "RepositorioApplication",
+            "request": "launch",
+            "mainClass": "br.com.faeterj.repositorio.RepositorioApplication"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-RepositorioApplication<ap10>",
             "request": "launch",
             "cwd": "${workspaceFolder}",

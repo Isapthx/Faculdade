@@ -1,0 +1,40 @@
+:root {
+    --azul-faeterj: #31517c;
+    --azul-escuro: #263e5f;
+    --cinza-fundo: #f8f9fa;
+    --branco: #ffffff;
+    --texto: #444;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--cinza-fundo);
+    color: var(--texto);
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: var(--azul-faeterj);
+    color: var(--branco);
+    padding: 40px 20px;
+    text-align: left;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+header p {
+    opacity: 0.9;
+    max-width: 800px;
+    line-height: 1.6;
+}
+
+main {
+    max-width: 1100px;
+    margin: -30px auto 40px; /* Sobe um pouco para sobrepor o header azul */
+    padding: 0 20px;
+}

@@ -6,7 +6,8 @@ export const API = {
         return await res.json();
     },
     async getDisciplinaPorId(id) {
-        const res = await fetch(`${API_BASE_URL}/disciplinas/${id}`);
+        const res = await fetch(`/api/disciplinas/${id}`);
+        if (!res.ok) throw new Error("Disciplina não encontrada");
         return await res.json();
     },
     async enviarAvaliacao(dados) {

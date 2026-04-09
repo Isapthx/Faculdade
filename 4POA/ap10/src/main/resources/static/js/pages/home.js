@@ -1,73 +1,38 @@
-// Importamos a lógica de API para não repetir código fetch aqui
-import { API } from '../api.js';
-
-// Função para criar o HTML de cada card de disciplina
-function criarCardDisciplina(disciplina) {
-    const card = document.createElement('div');
-    card.className = 'card-disciplina';
-    
-    // Lógica simples para cor do badge baseada no período
-    const corPeriodo = disciplina.periodo <= 2 ? 'verde' : 'azul';
-
-    card.innerHTML = `
-        <div class="card-header">
-            <span class="badge ${corPeriodo}">${disciplina.periodo}º Período</span>
-            <h3>${disciplina.nome}</h3>
-        </div>
-        <div class="card-body">
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="label">Dificuldade</span>
-                    <span class="value">${disciplina.dificuldadeMedia.toFixed(1)}/5</span>
-                </div>
-                <div class="stat-item">
-                    <span class="label">Importância</span>
-                    <span class="value">${disciplina.importanciaMedia.toFixed(1)}/5</span>
-                </div>
-            </div>
-        </div>
-        <div class="card-footer">
-            <button class="btn-detalhes" data-id="${disciplina.id}">
-                Ver Conteúdos e Links
-            </button>
-        </div>
-    `;
-
-    // Evento de clique para navegar para os detalhes
-    card.querySelector('.btn-detalhes').addEventListener('click', () => {
-        window.location.href = `detalhes.html?id=${disciplina.id}`;
-    });
-
-    return card;
-}
-
-// Função principal que inicializa a home
-async function initHome() {
-    const container = document.getElementById('container-cards');
-    
+// Função que busca os dados da sua API Java
+async function carregarDisciplinas() {
     try {
-        const disciplinas = await API.getDisciplinas();
-        
-        container.innerHTML = ''; // Remove o "Carregando..."
+        const resposta = await fetch('http://localhost:8080/api/disciplinas');
+        const disciplinas = await resposta.json();
+
+        const container = document.getElementById('container-cards');
+        container.innerHTML = ''; // Limpa o "Carregando..."
 
         if (disciplinas.length === 0) {
-            container.innerHTML = `
-                <div class="aviso-vazio">
-                    <p>Nenhuma disciplina cadastrada ainda.</p>
-                </div>`;
+            container.innerHTML = '<p>Nenhuma disciplina encontrada.</p>';
             return;
         }
 
         disciplinas.forEach(disc => {
-            const card = criarCardDisciplina(disc);
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = 
+                `<h3>${disc.nome}</h3><p><strong>Período:</strong> ${disc.periodo}º</p><p>⭐ Dificuldade: ${disc.dificuldadeMedia.toFixed(1)}</p><button onclick="verDetalhes(${disc.id})">Ver Conteúdos</button>`;
             container.appendChild(card);
         });
-
-    } catch (error) {
-        container.innerHTML = '<p class="erro">Erro ao carregar dados do servidor.</p>';
-        console.error('Erro ao carregar dados: ', error);
+    } catch (erro) {
+        console.error("Erro ao buscar disciplinas:", erro);
+        document.getElementById('container-cards').innerHTML = '<p>Erro ao conectar com o servidor.</p>';
     }
 }
 
-// Dispara a função quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', initHome);
+export const verDetalhes = (id) => {
+    // Redireciona o usuário para a página de detalhes passando o ID na URL
+    window.location.href = `detalhes.html?id=${id}`;
+}
+
+window.verDetalhes = verDetalhes;
+
+// Executa assim que a página abre
+carregarDisciplinas();
+
+window.alert('JS rodando');

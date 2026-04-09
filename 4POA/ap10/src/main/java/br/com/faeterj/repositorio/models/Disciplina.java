@@ -1,18 +1,24 @@
 package br.com.faeterj.repositorio.models;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 @Entity
 @Data // Se instalou o Lombok, isso gera Getters e Setters automaticamente
 public class Disciplina {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "disciplina", cascade = CascadeType.ALL)
+private List<Topico> topicos;
 
     private String nome;
     private Integer periodo;

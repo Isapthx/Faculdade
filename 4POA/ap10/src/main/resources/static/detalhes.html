@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes da Disciplina - Faeterj</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+    <header>
+        <a href="index.html">⬅ Voltar</a>
+        <h1 id="nome-disciplina">Carregando...</h1>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-btn active" data-target="ementa">Ementa/Matérias</button>
+            <button class="tab-btn" data-target="links">Links Úteis</button>
+            <button class="tab-btn" data-target="avaliar">Avaliações</button>
+        </div>
+
+        <section id="conteudo-detalhes">
+            <div id="ementa" class="tab-content"> </div>
+            <div id="links" class="tab-content" style="display:none"> </div>
+            <div id="avaliar" class="tab-content" style="display:none"> </div>
+        </section>
+    </main>
+
+    <script type="module" src="/js/pages/detalhes.js"></script>
+</body>
+</html>

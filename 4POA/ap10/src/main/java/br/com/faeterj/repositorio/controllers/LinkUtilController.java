@@ -1,4 +1,4 @@
-package br.edu.faeterj.ap10.controller;
+package br.com.faeterj.repositorio.controllers;
 
 import br.edu.faeterj.ap10.dto.LinkUtilRequestDTO;
 import br.edu.faeterj.ap10.model.LinkUtil;

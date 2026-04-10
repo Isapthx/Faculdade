@@ -24,5 +24,4 @@ public class Topico {
     @JoinColumn(name = "disciplina_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Disciplina disciplina;
-
 }

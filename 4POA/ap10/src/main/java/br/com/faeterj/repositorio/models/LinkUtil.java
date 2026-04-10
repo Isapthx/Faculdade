@@ -1,11 +1,6 @@
 package br.com.faeterj.repositorio.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,21 +14,18 @@ public class LinkUtil {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relação com a disciplina (apenas o ID é salvo, sem FK obrigatória no SQLite)
     @Column(name = "disciplina_id", nullable = false)
     private Long disciplinaId;
 
     @Column(nullable = false)
     private String nome;
 
-    // Tipos: playlist, lista, livro, slides, artigo, video
     @Column(nullable = false)
     private String tipo;
 
     @Column(nullable = false)
     private String url;
 
-    // Status: PENDENTE, APROVADO, REJEITADO
     @Column(nullable = false)
     private String status = "PENDENTE";
 

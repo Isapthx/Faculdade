@@ -1,46 +1,41 @@
 package br.com.faeterj.repositorio.controllers;
 
-import br.edu.faeterj.ap10.dto.LinkUtilRequestDTO;
-import br.edu.faeterj.ap10.model.LinkUtil;
-import br.edu.faeterj.ap10.service.LinkUtilService;
+import br.com.faeterj.repositorio.models.LinkUtil;
+import br.com.faeterj.repositorio.models.service.Linkutilservice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/links")
 @RequiredArgsConstructor
-// Se o seu front roda em porta diferente do Spring, descomente a linha abaixo:
-// @CrossOrigin(origins = "*")
 public class LinkUtilController {
 
-    private final LinkUtilService service;
+    private final Linkutilservice service;
 
-    // ------------------------------------------------------------------
-    // ROTAS PÚBLICAS (página de detalhes da disciplina)
-    // ------------------------------------------------------------------
-
-    // GET /api/links/disciplina/{id}  → lista links aprovados da disciplina
+    // GET /api/links/disciplina/{id} — links aprovados (página pública)
     @GetMapping("/disciplina/{disciplinaId}")
     public List<LinkUtil> listarAprovados(@PathVariable Long disciplinaId) {
         return service.listarAprovados(disciplinaId);
     }
 
-    // POST /api/links  → usuário sugere um novo link (fica PENDENTE)
+    // POST /api/links — usuário sugere um link
     @PostMapping
-    public ResponseEntity<LinkUtil> sugerir(@RequestBody LinkUtilRequestDTO dto) {
-        LinkUtil salvo = service.sugerirLink(dto);
+    public ResponseEntity<LinkUtil> sugerir(@RequestBody Map<String, Object> body) {
+        String nome = (String) body.get("nome");
+        String tipo = (String) body.get("tipo");
+        String url  = (String) body.get("url");
+        Long disciplinaId = Long.valueOf(body.get("disciplinaId").toString());
+
+        LinkUtil salvo = service.sugerirLink(nome, tipo, url, disciplinaId);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
-    // ------------------------------------------------------------------
-    // ROTAS ADMINISTRATIVAS
-    // ------------------------------------------------------------------
-
-    // GET /api/links/pendentes  → admin vê o que precisa moderar
+    // GET /api/links/pendentes — admin vê pendentes
     @GetMapping("/pendentes")
     public List<LinkUtil> listarPendentes() {
         return service.listarPendentes();

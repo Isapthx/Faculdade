@@ -12,7 +12,8 @@ Todo o código-fonte está centralizado na pasta principal `/4POA`. Dentro dela,
 ### Estrutura de Diretórios:
 ```text
 📦 4POA
- ┣ 📂 ap1-introducao-e-revisao   # Descrição curta do que foi feito na AP 1
- ┣ 📂 ap2-heranca-polimorfismo   # Descrição curta do que foi feito na AP 2
- ┣ 📂 ap3-interfaces-excecoes    # Descrição curta do que foi feito na AP 3
+ ┣ 📂 ap1 - Atividade aplicada 1   
+ ┣ 📂 ap2 - Atividade aplicada 2
+ ┣ 📂 {...}
+ ┣ 📂 ap10 - Atividade aplicada 10  # **Destaque:** Aplicação WEB em JAVA, a criação de um ementário acerca das matérias da nossa instituição de ensino
  ┗ 📜 README.md

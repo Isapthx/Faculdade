@@ -1,30 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <m<!DOCTYPE html>
+<html lang="pt-br">
+<head>
     <meta charset="UTF-8">
-    <title>Detalhes da Disciplina - Faeterj</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Disciplina - FAETERJ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/detalhes.css">
 </head>
 <body>
-    <header>
-        <a href="index.html">⬅ Voltar</a>
-        <h1 id="nome-disciplina">Carregando...</h1>
+
+    <header class="site-header detalhes-header">
+        <div class="header-inner">
+            <a href="index.html" class="btn-voltar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
+                </svg>
+                Voltar
+            </a>
+
+            <h1 class="header-titulo" id="nome-disciplina">Carregando...</h1>
+
+            <div class="header-metricas">
+                <span class="metrica-badge">
+                    ⭐ Dificuldade: <strong id="dificuldade-valor">—</strong>
+                </span>
+                <span class="metrica-badge">
+                    🎯 Importância: <strong id="importancia-valor">—</strong>
+                </span>
+            </div>
+        </div>
     </header>
 
-    <main>
-        <div class="tabs">
-            <button class="tab-btn active" data-target="ementa">Ementa/Matérias</button>
-            <button class="tab-btn" data-target="links">Links Úteis</button>
-            <button class="tab-btn" data-target="avaliar">Avaliações</button>
+    <main class="site-main detalhes-main">
+
+        <div class="detalhes-card">
+
+            <!-- Abas -->
+            <div class="tabs">
+                <button class="tab-btn active" data-target="ementa">Ementa/Matérias</button>
+                <button class="tab-btn" data-target="links">Links Úteis</button>
+            </div>
+
+            <!-- Conteúdos das abas -->
+            <div id="ementa" class="tab-content"></div>
+            <div id="links"  class="tab-content" style="display:none;"></div>
+
         </div>
 
-        <section id="conteudo-detalhes">
-            <div id="ementa" class="tab-content"> </div>
-            <div id="links" class="tab-content" style="display:none"> </div>
-            <div id="avaliar" class="tab-content" style="display:none"> </div>
-        </section>
     </main>
+
+    <footer class="site-footer">
+        <p>FAETERJ - Faculdade de Educação Tecnológica do Estado do Rio de Janeiro</p>
+    </footer>
 
     <script type="module" src="/js/pages/detalhes.js"></script>
 </body>

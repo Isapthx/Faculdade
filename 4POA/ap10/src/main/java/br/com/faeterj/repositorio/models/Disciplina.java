@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,7 +18,7 @@ public class Disciplina {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "disciplina", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "disciplina", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 private List<Topico> topicos;
 
     private String nome;

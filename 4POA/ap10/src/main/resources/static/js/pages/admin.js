@@ -75,7 +75,8 @@ function configurarFormularios() {
         const dados = {
             nome:        document.getElementById('nome').value,
             periodo:     Number(document.getElementById('periodo').value),
-            dificuldade: Number(document.getElementById('dificuldade').value),
+            dificuldadeMedia: Number(document.getElementById('dificuldade').value),
+            importanciaMedia: Number(document.getElementById('importancia').value),
         };
         try {
             await fetch('/api/disciplinas', {

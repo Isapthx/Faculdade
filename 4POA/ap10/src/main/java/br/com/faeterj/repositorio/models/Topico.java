@@ -23,5 +23,5 @@ public class Topico {
     @ManyToOne
     @JoinColumn(name = "disciplina_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Disciplina disciplina;
+    private Disciplina disciplina; 
 }

@@ -1,40 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 :root {
-    --azul-faeterj: #31517c;
-    --azul-escuro: #263e5f;
-    --cinza-fundo: #f8f9fa;
-    --branco: #ffffff;
-    --texto: #444;
+    --azul-faeterj:  #31517c;
+    --azul-escuro:   #263e5f;
+    --azul-hover:    #1e3250;
+    --cinza-fundo:   #f4f5f7;
+    --cinza-borda:   #e2e5ea;
+    --branco:        #ffffff;
+    --texto:         #3a3f47;
+    --texto-suave:   #6b7280;
+    --radius-card:   14px;
+    --sombra-card:   0 2px 12px rgba(0,0,0,0.07);
 }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
     background-color: var(--cinza-fundo);
     color: var(--texto);
-    margin: 0;
-    padding: 0;
-}
-
-header {
-    background-color: var(--azul-faeterj);
-    color: var(--branco);
-    padding: 40px 20px;
-    text-align: left;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 2.5rem;
-    font-weight: 700;
-}
-
-header p {
-    opacity: 0.9;
-    max-width: 800px;
     line-height: 1.6;
 }
 
-main {
+/* ── Header ──────────────────────────────────────────────── */
+.site-header {
+    background-color: var(--azul-faeterj);
+    padding: 56px 20px 80px;        /* padding extra embaixo para o main sobrepor */
+}
+
+.header-inner {
     max-width: 1100px;
-    margin: -30px auto 40px; /* Sobe um pouco para sobrepor o header azul */
+    margin: 0 auto;
+}
+
+.header-titulo {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: var(--branco);
+    letter-spacing: -0.5px;
+    margin-bottom: 14px;
+}
+
+.header-subtitulo {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.85);
+    max-width: 680px;
+    line-height: 1.65;
+    margin-bottom: 28px;
+}
+
+.btn-baixar {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--branco);
+    border: 2px solid rgba(255,255,255,0.7);
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-baixar:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: var(--branco);
+}
+
+/* ── Main ────────────────────────────────────────────────── */
+.site-main {
+    max-width: 1100px;
+    margin: -40px auto 60px;        /* sobe para sobrepor o header */
     padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.site-footer {
+    background: var(--azul-escuro);
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    padding: 24px 20px;
+    font-size: 0.875rem;
 }

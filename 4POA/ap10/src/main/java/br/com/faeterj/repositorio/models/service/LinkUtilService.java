@@ -1,15 +1,16 @@
 package br.com.faeterj.repositorio.models.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import br.com.faeterj.repositorio.models.LinkUtil;
 import br.com.faeterj.repositorio.repositories.LinkUtilRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class Linkutilservice {
+public class LinkUtilService {
 
     private final LinkUtilRepository repository;
 

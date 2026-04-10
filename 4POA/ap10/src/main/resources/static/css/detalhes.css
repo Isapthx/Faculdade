@@ -1,0 +1,249 @@
+/* ── Header da página de detalhes ───────────────────────────── */
+.detalhes-header {
+    padding-bottom: 72px; /* espaço para o card subir */
+}
+
+.btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    transition: color 0.2s;
+}
+
+.btn-voltar:hover { color: #fff; }
+
+.header-metricas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.metrica-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.92);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.metrica-badge strong { color: #fff; }
+
+/* ── Layout da página ────────────────────────────────────────── */
+.detalhes-main {
+    margin-top: -40px !important;
+}
+
+/* Card principal que engloba tudo */
+.detalhes-card {
+    background: var(--branco);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--cinza-borda);
+    box-shadow: var(--sombra-card);
+    overflow: hidden;
+}
+
+/* ── Abas ────────────────────────────────────────────────────── */
+.tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--cinza-borda);
+    padding: 0 28px;
+    background: var(--branco);
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--texto-suave);
+    padding: 18px 22px;
+    font-size: 0.925rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px; /* sobrepõe a borda do container */
+    border-radius: 0;
+}
+
+.tab-btn:hover { color: var(--azul-faeterj); }
+
+.tab-btn.active {
+    color: var(--azul-faeterj);
+    border-bottom-color: var(--azul-faeterj);
+    background: none;
+}
+
+/* ── Conteúdo das abas ───────────────────────────────────────── */
+.tab-content {
+    padding: 28px 32px;
+    min-height: 200px;
+}
+
+/* Aviso de vazio */
+.aviso-vazio {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--texto-suave);
+}
+
+.aviso-vazio p { font-size: 0.95rem; }
+
+/* Lista da ementa */
+.lista-ementa {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lista-ementa li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--cinza-fundo);
+    border: 1px solid var(--cinza-borda);
+    border-left: 4px solid var(--azul-faeterj);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    color: var(--texto);
+    box-shadow: none;
+}
+
+.icon-check {
+    color: var(--azul-faeterj);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* ── Seção de Links ──────────────────────────────────────────── */
+.links-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.links-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--texto);
+    margin: 0;
+}
+
+/* Formulário de sugestão */
+.form-sugestao {
+    background: var(--cinza-fundo);
+    border: 1px solid var(--cinza-borda);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: none;
+}
+
+.form-sugestao h4 {
+    font-size: 0.975rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+}
+
+.form-sugestao p {
+    font-size: 0.84rem;
+    color: var(--texto-suave);
+    margin-bottom: 16px;
+}
+
+.form-sugestao-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.form-sugestao input,
+.form-sugestao select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--cinza-borda);
+    border-radius: 8px;
+    font-size: 0.925rem;
+    font-family: inherit;
+    color: var(--texto);
+    background: var(--branco);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.form-sugestao input:focus,
+.form-sugestao select:focus {
+    border-color: var(--azul-faeterj);
+    box-shadow: 0 0 0 3px rgba(49,81,124,0.1);
+}
+
+.form-sugestao-acoes {
+    display: flex;
+    gap: 10px;
+}
+
+/* Tabela de links */
+.tabela-links {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela-links thead tr {
+    background: var(--cinza-fundo);
+}
+
+.tabela-links th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.tabela-links td {
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--cinza-borda);
+    font-size: 0.9rem;
+}
+
+.tabela-links tbody tr:last-child td { border-bottom: none; }
+
+.tabela-links tbody tr:hover { background: var(--cinza-fundo); }
+
+.link-acesso {
+    color: var(--azul-faeterj);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.link-acesso:hover { text-decoration: underline; }
+
+/* Estado vazio de links */
+.links-vazio {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--texto-suave);
+}
+
+.links-vazio p:first-child { font-size: 2rem; margin-bottom: 8px; }
+.links-vazio p:last-child  { font-size: 0.84rem; }

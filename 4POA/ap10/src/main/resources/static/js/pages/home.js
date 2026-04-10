@@ -1,7 +1,7 @@
 // Função que busca os dados da sua API Java
 async function carregarDisciplinas() {
     try {
-        const resposta = await fetch('http://localhost:8080/api/disciplinas');
+        const resposta = await fetch('/api/disciplinas');
         const disciplinas = await resposta.json();
 
         const container = document.getElementById('container-cards');
@@ -34,5 +34,3 @@ window.verDetalhes = verDetalhes;
 
 // Executa assim que a página abre
 carregarDisciplinas();
-
-window.alert('JS rodando');

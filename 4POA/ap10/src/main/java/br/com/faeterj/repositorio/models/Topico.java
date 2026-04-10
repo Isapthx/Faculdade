@@ -1,6 +1,6 @@
 package br.com.faeterj.repositorio.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +22,7 @@ public class Topico {
 
     @ManyToOne
     @JoinColumn(name = "disciplina_id")
-    @JsonIgnore // Evita que o JSON entre em loop infinito ao listar disciplina -> topico -> disciplina
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Disciplina disciplina;
 
 }

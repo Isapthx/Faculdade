@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - FAETERJ</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        /* Pequeno ajuste local para a tabela ficar bonita */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #666; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .sessao-admin { margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1100px; margin: 0 auto;">
+            <div>
+                <a href="index.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Voltar ao Site</a>
+                <h1>Painel Administrativo</h1>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="card-disciplina sessao-admin">
+            <h2>Cadastrar Nova Disciplina</h2>
+            <form id="form-disciplina">
+                <div style="display: grid; gap: 15px; margin-top: 15px;">
+                    <input type="text" id="nome" placeholder="Nome da Disciplina (ex: Estrutura de Dados)" required style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <input type="number" id="periodo" placeholder="Período (ex: 3)" required style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                        <input type="number" step="0.1" id="dificuldade" placeholder="Dificuldade (0 a 5)" required style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                    </div>
+                    
+                    <button type="submit" class="btn-principal" style="background: var(--azul-faeterj); color: white; width: 100%; justify-content: center;">
+                        Salvar Disciplina
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card-disciplina sessao-admin">
+            <h2>Gerenciar Ementa (Matérias)</h2>
+            <p style="font-size: 0.9rem; color: #666;">Selecione uma disciplina e adicione os tópicos que serão estudados.</p>
+            
+            <form id="form-topico">
+                <div style="display: grid; gap: 15px; margin-top: 15px;">
+                    <select id="select-disciplinas" required style="padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white;">
+                        <option value="">Carregando disciplinas...</option>
+                    </select>
+                    
+                    <input type="text" id="titulo-topico" placeholder="Título do tópico (ex: Listas Encadeadas)" required style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                    
+                    <button type="submit" class="btn-principal" style="background: #28a745; color: white; border-color: #28a745; width: 100%; justify-content: center;">
+                        Adicionar à Ementa
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card-disciplina">
+            <h2>Disciplinas Cadastradas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Período</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-disciplinas">
+                    <tr><td colspan="3">Carregando dados...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script type="module" src="/js/pages/admin.js"></script>
+</body>
+</html>

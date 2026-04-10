@@ -9,11 +9,11 @@ Repositório destinado ao armazenamento das atividades e mini-projetos desenvolv
 
 Todo o código-fonte está centralizado na pasta principal `/4POA`. Dentro dela, o conteúdo é dividido por "APs" (Atividades Práticas), onde cada pasta representa um mini-projeto ou lista de exercícios específica da matéria.
 
-### Estrutura de Diretórios:
+### 📁 Estrutura de Diretórios:
 ```text
 📦 4POA
  ┣ 📂 ap1 - Atividade aplicada 1   
  ┣ 📂 ap2 - Atividade aplicada 2
  ┣ 📂 {...}
- ┣ 📂 ap10 - Atividade aplicada 10  # **Destaque:** Aplicação WEB em JAVA, a criação de um ementário acerca das matérias da nossa instituição de ensino
+ ┣ 📂 ap10 - Atividade aplicada 10  🌟 (Projeto Destaque)
  ┗ 📜 README.md

@@ -3,120 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo - FAETERJ</title>
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/components.css">
+    <title>Painel Admin — FAETERJ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-        th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #666; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        .sessao-admin { margin-bottom: 40px; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Badge de contagem de pendentes */
-        .badge-pendentes {
-            display: inline-block;
-            background: #dc3545;
-            color: white;
-            border-radius: 12px;
-            padding: 2px 9px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            margin-left: 8px;
+        :root {
+            --azul:       #31517c;
+            --azul-vivo:  #3d6499;
+            --azul-claro: #e8eef6;
+            --verde:      #1a7a3e;
+            --verde-bg:   #eaffee;
+            --vermelho:   #c0392b;
+            --verm-bg:    #fdf0ef;
+            --amarelo:    #f39c12;
+            --amar-bg:    #fef9ec;
+            --cinza-0:    #f7f8fa;
+            --cinza-1:    #eef0f4;
+            --cinza-2:    #dde1e9;
+            --cinza-3:    #b0b8c8;
+            --cinza-5:    #6b7588;
+            --cinza-8:    #2c3345;
+            --branco:     #ffffff;
+            --sombra:     0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.07);
+            --radius:     14px;
+            --radius-sm:  8px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cinza-0);
+            color: var(--cinza-8);
+            min-height: 100vh;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed; top: 0; left: 0;
+            width: 220px; height: 100vh;
+            background: var(--azul);
+            display: flex; flex-direction: column;
+            padding: 32px 0;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 0 24px 28px;
+            border-bottom: 1px solid rgba(255,255,255,.12);
+        }
+        .sidebar-logo span {
+            display: block;
+            font-size: .7rem; font-weight: 500; letter-spacing: .12em;
+            color: rgba(255,255,255,.5); text-transform: uppercase; margin-bottom: 4px;
+        }
+        .sidebar-logo strong {
+            font-size: 1.15rem; font-weight: 600; color: #fff;
+        }
+
+        .sidebar-nav {
+            padding: 20px 12px;
+            flex: 1;
+            display: flex; flex-direction: column; gap: 2px;
+        }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            color: rgba(255,255,255,.65);
+            font-size: .88rem; font-weight: 500;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            text-decoration: none;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,.12);
+            color: #fff;
+        }
+        .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 20px 24px 0;
+            border-top: 1px solid rgba(255,255,255,.12);
+        }
+        .sidebar-footer a {
+            font-size: .82rem; color: rgba(255,255,255,.5);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .sidebar-footer a:hover { color: rgba(255,255,255,.85); }
+
+        /* ── MAIN CONTENT ── */
+        .content {
+            margin-left: 220px;
+            padding: 36px 40px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+        .page-header h1 {
+            font-size: 1.6rem; font-weight: 600; color: var(--cinza-8);
+            letter-spacing: -.02em;
+        }
+        .page-header p {
+            font-size: .9rem; color: var(--cinza-5); margin-top: 4px;
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--branco);
+            border-radius: var(--radius);
+            box-shadow: var(--sombra);
+            border: 1px solid var(--cinza-1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--cinza-1);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .card-header h2 {
+            font-size: 1rem; font-weight: 600; color: var(--cinza-8);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-header .icon-label {
+            width: 28px; height: 28px; border-radius: 7px;
+            background: var(--azul-claro);
+            display: flex; align-items: center; justify-content: center;
+            font-size: .9rem;
+        }
+        .card-body { padding: 24px; }
+
+        /* ── FORM ELEMENTS ── */
+        .form-grid { display: grid; gap: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+        label.field-label {
+            display: block; font-size: .78rem; font-weight: 500;
+            color: var(--cinza-5); margin-bottom: 6px; letter-spacing: .03em;
+        }
+
+        input[type=text], input[type=number], input[type=url], select, textarea {
+            width: 100%; padding: 10px 14px;
+            border: 1.5px solid var(--cinza-2);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .92rem; color: var(--cinza-8);
+            background: var(--branco);
+            transition: border-color .15s, box-shadow .15s;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: var(--azul-vivo);
+            box-shadow: 0 0 0 3px rgba(61,100,153,.12);
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 10px 18px; border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .88rem; font-weight: 500;
+            cursor: pointer; border: none; transition: .15s;
+        }
+        .btn-primary {
+            background: var(--azul); color: #fff;
+        }
+        .btn-primary:hover { background: var(--azul-vivo); }
+
+        .btn-success {
+            background: var(--verde-bg); color: var(--verde);
+            border: 1.5px solid #b2dfc3;
+        }
+        .btn-success:hover { background: #d4f0df; }
+
+        .btn-danger {
+            background: var(--verm-bg); color: var(--vermelho);
+            border: 1.5px solid #f0c0bc;
+        }
+        .btn-danger:hover { background: #fad9d6; }
+
+        .btn-sm { padding: 6px 12px; font-size: .82rem; }
+        .btn-full { width: 100%; justify-content: center; }
+
+        /* ── TABLE ── */
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--cinza-0); }
+        th {
+            text-align: left; padding: 10px 16px;
+            font-size: .75rem; font-weight: 600; letter-spacing: .06em;
+            color: var(--cinza-5); text-transform: uppercase;
+            border-bottom: 1px solid var(--cinza-1);
+        }
+        td {
+            padding: 13px 16px;
+            font-size: .9rem;
+            border-bottom: 1px solid var(--cinza-1);
             vertical-align: middle;
         }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr { transition: background .1s; }
+        tbody tr:hover { background: var(--cinza-0); }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: .75rem; font-weight: 600;
+        }
+        .badge-pendente { background: var(--amar-bg); color: #b7760a; }
+        .badge-aprovado { background: var(--verde-bg); color: var(--verde); }
+        .badge-tipo {
+            background: var(--azul-claro); color: var(--azul);
+            font-family: 'DM Mono', monospace; font-size: .72rem;
+            padding: 2px 8px; border-radius: 5px; font-weight: 400;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; padding: 40px 20px; color: var(--cinza-3);
+        }
+        .empty-state .empty-icon { font-size: 2rem; margin-bottom: 10px; }
+        .empty-state p { font-size: .9rem; }
+
+        /* ── MENSAGEM ── */
+        .msg { padding: 10px 14px; border-radius: var(--radius-sm); font-size: .88rem; display: none; }
+        .msg.ok  { background: var(--verde-bg); color: var(--verde); }
+        .msg.err { background: var(--verm-bg);  color: var(--vermelho); }
+
+        /* ── STATS TOPO ── */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--branco);
+            border: 1px solid var(--cinza-1);
+            border-radius: var(--radius);
+            box-shadow: var(--sombra);
+            padding: 20px 24px;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .stat-icon {
+            width: 44px; height: 44px; border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; flex-shrink: 0;
+        }
+        .stat-icon.blue  { background: var(--azul-claro); }
+        .stat-icon.green { background: var(--verde-bg); }
+        .stat-icon.amber { background: var(--amar-bg); }
+        .stat-info span { font-size: .75rem; color: var(--cinza-5); font-weight: 500; }
+        .stat-info strong { display: block; font-size: 1.5rem; font-weight: 600; color: var(--cinza-8); line-height: 1.2; }
+
+        /* ── URL truncada ── */
+        .url-cell {
+            max-width: 200px; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+        }
+        .url-cell a {
+            color: var(--azul-vivo); text-decoration: none; font-size: .85rem;
+        }
+        .url-cell a:hover { text-decoration: underline; }
+
+        /* ── ACTIONS ── */
+        .actions { display: flex; gap: 6px; }
     </style>
 </head>
 <body>
-    <header>
-        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1100px; margin: 0 auto;">
-            <div>
-                <a href="index.html" style="color: white; text-decoration: none; font-size: 0.9rem;">← Voltar ao Site</a>
-                <h1>Painel Administrativo</h1>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <span>Painel Admin</span>
+        <strong>FAETERJ</strong>
+    </div>
+    <nav class="sidebar-nav">
+        <a class="nav-item active" href="#disciplinas">
+            <span class="icon">📚</span> Disciplinas
+        </a>
+        <a class="nav-item" href="#ementa">
+            <span class="icon">📋</span> Ementa
+        </a>
+        <a class="nav-item" href="#links">
+            <span class="icon">🔗</span> Links
+            <span id="badge-nav" style="margin-left:auto; background:rgba(255,255,255,.2); color:#fff;
+                border-radius:10px; padding:1px 7px; font-size:.72rem; display:none;"></span>
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="index.html">← Voltar ao site</a>
+    </div>
+</aside>
+
+<!-- ── CONTENT ── -->
+<main class="content">
+
+    <div class="page-header">
+        <h1>Painel Administrativo</h1>
+        <p>Gerencie disciplinas, ementas e modere os links sugeridos pelos alunos.</p>
+    </div>
+    <!-- ── Cadastrar disciplina ── -->
+    <div class="card" id="disciplinas">
+        <div class="card-header">
+            <h2><span class="icon-label">📚</span> Cadastrar Nova Disciplina</h2>
+        </div>
+        <div class="card-body">
+            <form id="form-disciplina" class="form-grid">
+                <div>
+                    <label class="field-label">Nome da disciplina</label>
+                    <input type="text" id="nome" placeholder="ex: Estrutura de Dados" required>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label class="field-label">Período</label>
+                        <input type="number" id="periodo" placeholder="ex: 3" required>
+                    </div>
+                    <div>
+                        <label class="field-label">Dificuldade (0–5)</label>
+                        <input type="number" step="0.1" id="dificuldade" placeholder="ex: 3.5" required>
+                    </div>
+                    <div>
+                        <label class="field-label">Importância (1–10)</label>
+                        <input type="number" id="importancia" min="1" max="10" step="0.1" placeholder="ex: 8" required>
+                    </div>
+                </div>
+                <div id="msg-disciplina" class="msg"></div>
+                <button type="submit" class="btn btn-primary btn-full">Salvar disciplina</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Ementa ── -->
+    <div class="card" id="ementa">
+        <div class="card-header">
+            <h2><span class="icon-label">📋</span> Gerenciar Ementa</h2>
+        </div>
+        <div class="card-body">
+            <form id="form-topico" class="form-grid">
+                <div>
+                    <label class="field-label">Disciplina</label>
+                    <select id="select-disciplinas" required>
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">Título do tópico</label>
+                    <input type="text" id="titulo-topico" placeholder="ex: Listas Encadeadas" required>
+                </div>
+                <div id="msg-topico" class="msg"></div>
+                <button type="submit" class="btn btn-success btn-full">+ Adicionar à ementa</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Links pendentes ── -->
+    <div class="card" id="links">
+        <div class="card-header">
+            <h2><span class="icon-label">🔗</span> Links Sugeridos — Moderação</h2>
+            <span id="badge-count" class="badge badge-pendente" style="display:none"></span>
+        </div>
+        <div class="card-body" style="padding:0;">
+            <div id="secao-links-pendentes">
+                <div class="empty-state">
+                    <div class="empty-icon">⏳</div>
+                    <p>Carregando sugestões...</p>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <main>
-        <!-- ── Cadastrar disciplina ── -->
-        <section class="card-disciplina sessao-admin">
-            <h2>Cadastrar Nova Disciplina</h2>
-            <form id="form-disciplina">
-                <div style="display: grid; gap: 15px; margin-top: 15px;">
-                    <input type="text" id="nome" placeholder="Nome da Disciplina (ex: Estrutura de Dados)" required
-                        style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <input type="number" id="periodo" placeholder="Período (ex: 3)" required
-                            style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-                        <input type="number" step="0.1" id="dificuldade" placeholder="Dificuldade (0 a 5)" required
-                            style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-                            <input type="number" id="importancia" min="1" max="10" step="0.1" placeholder="Importância (1-10)" required
-                            style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;"/>
-                    </div>
-                    
-                    <button type="submit" class="btn-principal"
-                        style="background: var(--azul-faeterj); color: white; width: 100%; justify-content: center;">
-                        Salvar Disciplina
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- ── Gerenciar ementa ── -->
-        <section class="card-disciplina sessao-admin">
-            <h2>Gerenciar Ementa (Matérias)</h2>
-            <p style="font-size: 0.9rem; color: #666;">Selecione uma disciplina e adicione os tópicos que serão estudados.</p>
-            
-            <form id="form-topico">
-                <div style="display: grid; gap: 15px; margin-top: 15px;">
-                    <select id="select-disciplinas" required
-                        style="padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white;">
-                        <option value="">Carregando disciplinas...</option>
-                    </select>
-                    
-                    <input type="text" id="titulo-topico" placeholder="Título do tópico (ex: Listas Encadeadas)" required
-                        style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-                    
-                    <button type="submit" class="btn-principal"
-                        style="background: #28a745; color: white; border-color: #28a745; width: 100%; justify-content: center;">
-                        Adicionar à Ementa
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- ── Moderação de links sugeridos (NOVO) ── -->
-        <section class="card-disciplina sessao-admin">
-            <h2>
-                Links Sugeridos — Moderação
-                <span class="badge-pendentes" id="badge-count" style="display:none">!</span>
-            </h2>
-            <p style="font-size: 0.9rem; color: #666;">
-                Revise os links enviados pelos usuários. Aprove para torná-los visíveis ou rejeite para descartá-los.
-            </p>
-            <div id="secao-links-pendentes">
-                <p style="color:#888">Carregando sugestões...</p>
-            </div>
-        </section>
-
-        <!-- ── Disciplinas cadastradas ── -->
-        <section class="card-disciplina">
-            <h2>Disciplinas Cadastradas</h2>
+    <!-- ── Disciplinas cadastradas ── -->
+    <div class="card">
+        <div class="card-header">
+            <h2><span class="icon-label">🗂️</span> Disciplinas Cadastradas</h2>
+        </div>
+        <div class="card-body" style="padding:0;">
             <table>
                 <thead>
                     <tr>
                         <th>Nome</th>
                         <th>Período</th>
+                        <th>Dificuldade</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tabela-disciplinas">
-                    <tr><td colspan="3">Carregando dados...</td></tr>
+                    <tr><td colspan="4" style="text-align:center; color:#aaa; padding:24px;">Carregando...</td></tr>
                 </tbody>
             </table>
-        </section>
-    </main>
+        </div>
+    </div>
 
-    <script type="module" src="/js/pages/admin.js"></script>
+</main>
+
+<script type="module" src="/js/pages/admin.js"></script>
 </body>
 </html>

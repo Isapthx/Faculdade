@@ -63,3 +63,18 @@ def cadastrar_cliente(id_cliente: str, nome: str, telefone: str):
 def listar_clientes():
     return CLIENTES_DB
 
+@app.post("/vendas/", status_code=201)
+    def registrar_venda(id_venda: str, id_cliente: str, id_produto: str, quant_venda: int, forma_pagamento: str):
+        if id_cliente not in CLIENTES_DB:
+            raise HTTPException(status_code=404, detail = "Cliente não encontrado.")
+        if id_produto not in PRODUTOS_DB:
+            raise HTTPException(status_code=404, detail = "Produto não encontrado.")
+        if quant_venda <= 0:
+            raise HTTPException(status_code=400, detail = "A quantidade de venda deve ser maior que que zero.")
+        
+        lotes_disponiveis = [
+            {"id_lote": k, **v} for k, v in LOTES_DB.items()
+            if v["id_produto"] == id_produto and v["quantidade"] > 0
+        ]
+
+        

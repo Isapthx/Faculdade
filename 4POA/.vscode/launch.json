@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CatalogoApplication",
+            "request": "launch",
+            "mainClass": "com.vitrinedigital.catalogo.CatalogoApplication",
+            "projectName": "catalogo"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-RepositorioApplication<ap10>",
             "request": "launch",
             "cwd": "${workspaceFolder}",

@@ -22,3 +22,35 @@ export async function getEmpresaBySlug(slug: string): Promise<Empresa | null> {
     return null;
   }
 }
+
+interface ItemOrcamento {
+  produtoId: number;
+  quantidade: number;
+}
+
+interface EnviarOrcamentoPayload {
+  nomeCliente: string;
+  observacao: string;
+  itens: ItemOrcamento[];
+}
+
+export async function enviarOrcamento(
+  slug: string,
+  payload: EnviarOrcamentoPayload
+): Promise<{ url: string } | null> {
+  try {
+    const res = await fetch(
+      `http://localhost:8080/api/empresas/${slug}/orcamento`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!res.ok) throw new Error("Falha ao enviar orçamento");
+    return res.json();
+  } catch (error) {
+    console.error("Erro ao enviar orçamento:", error);
+    return null;
+  }
+}

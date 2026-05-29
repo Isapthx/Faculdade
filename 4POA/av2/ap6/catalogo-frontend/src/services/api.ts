@@ -1,5 +1,7 @@
 import { Empresa } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 // Função para buscar os dados da empresa e catálogo pelo slug
 export async function getEmpresaBySlug(slug: string): Promise<Empresa | null> {
   try {

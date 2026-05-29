@@ -40,7 +40,7 @@ public class DataLoader implements CommandLineRunner {
         Empresa empresa = new Empresa();
         empresa.setNome("Padaria Do Zé");
         empresa.setSlug("padaria-do-ze");
-        empresa.setWhatsapp("5521999999999");
+        empresa.setWhatsapp("5521975718928");
 
         // 2. Categoria "Pães e Doces"
         Categoria catPadaria = new Categoria();

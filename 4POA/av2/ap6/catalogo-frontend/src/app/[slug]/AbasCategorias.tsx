@@ -66,7 +66,7 @@ export default function AbasCategorias({ categorias = [] }: { categorias?: Categ
         })}
       </div>
 
-      console.log("ta ")
+      
 
       {/* Listagem dos Produtos da Categoria Ativa */}
       <div className="p-4 space-y-3">

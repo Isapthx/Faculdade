@@ -13,7 +13,6 @@ export interface Produto {
 export interface Categoria {
   id: number,
   nome: string;
-  empresa: Empresa;
   produtos: Produto[];
 }
 

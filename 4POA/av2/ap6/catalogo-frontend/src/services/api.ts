@@ -5,10 +5,13 @@ export async function getEmpresaBySlug(slug: string): Promise<Empresa | null> {
   try {
     const res = await fetch(`http://localhost:8080/api/empresas/${slug}`, {
       // revalidate: 60 // Opcional: faz o Next.js guardar um cache por 60 segundos
-      next: { revalidate: 10 } 
+      cache: "no-store"
     });
 
     if (!res.ok) {
+        console.error("Status do Backend: ", res.status, res.statusText);
+        const body = await res.text();
+        console.error("Corpo do erro: ", body);
       if (res.status === 404) return null;
       throw new Error("Falha ao buscar dados do servidor");
     }

@@ -1,7 +1,9 @@
 package com.vitrinedigital.catalogo.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.BatchSize;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -39,8 +41,9 @@ public class Categoria {
     @JoinColumn(name = "empresa_id", nullable = false)
     private Empresa empresa;
 
+    @BatchSize(size = 10)
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Produto> produtos = new HashSet<>();
+    private List<Produto> produtos = new ArrayList<>();
 
     public void adicionarProduto(Produto produto) {
         this.produtos.add(produto);

@@ -20,10 +20,9 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
     List<Empresa> findByNomeContainingIgnoreCase(String nome);
 
     @Query("""
-            SELECT DISTINCT e FROM Empresa e
-            LEFT JOIN FETCH e.categorias c
-            LEFT JOIN FETCH c.produtos
-            WHERE e.slug = :slug
-            """)
+    SELECT DISTINCT e FROM Empresa e
+    LEFT JOIN FETCH e.categorias
+    WHERE e.slug = :slug
+    """)
     Optional<Empresa> findBySlugComCategorias(@Param("slug") String slug);
 }

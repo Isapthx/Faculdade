@@ -1,15 +1,26 @@
 package com.vitrinedigital.catalogo.controller;
 
-import com.vitrinedigital.catalogo.model.Empresa;
-import com.vitrinedigital.catalogo.service.EmpresaService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vitrinedigital.catalogo.dto.EnviarOrcamentoDTO;
+import com.vitrinedigital.catalogo.dto.LinkWppDTO;
+import com.vitrinedigital.catalogo.model.Empresa;
+import com.vitrinedigital.catalogo.service.EmpresaService;
+
 @RestController
-@RequestMapping("/api/admin/empresas")
+@RequestMapping("/api/empresas")
 @CrossOrigin(origins = "*")
 public class AdminEmpresaController {
 
@@ -24,9 +35,17 @@ public class AdminEmpresaController {
         return ResponseEntity.ok(empresaService.listarTodas());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Empresa> buscar(@PathVariable Long id) {
-        return ResponseEntity.ok(empresaService.buscarPorId(id));
+    @GetMapping("/{id:\\d+}")
+    public ResponseEntity<Empresa> buscarPorId(@PathVariable Long id) {
+        Empresa empresa = empresaService.buscarPorId(id);
+        return ResponseEntity.ok(empresa);
+    }
+
+    // Qualquer outro texto enviado (como "padaria-do-ze") cairá automaticamente aqui
+    @GetMapping("/{slug}")
+    public ResponseEntity<Empresa> buscarPorSlug(@PathVariable String slug) {
+        Empresa empresa = empresaService.buscarPorSlug(slug);
+        return ResponseEntity.ok(empresa);
     }
 
     @PostMapping
@@ -44,5 +63,11 @@ public class AdminEmpresaController {
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         empresaService.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{slug}/orcamento")
+    public ResponseEntity<LinkWppDTO> enviarOrcamento(@PathVariable String slug, @RequestBody EnviarOrcamentoDTO dto) {
+        LinkWppDTO linkDto = empresaService.gerarLinkOrcamento(slug, dto);
+        return ResponseEntity.ok(linkDto);
     }
 }

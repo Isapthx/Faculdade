@@ -1,7 +1,8 @@
 package com.vitrinedigital.catalogo.dto;
+import java.util.List;
 
 import com.vitrinedigital.catalogo.model.Categoria;
-import java.util.List;
+
 
 public record CategoriaDTO(
         Long id,

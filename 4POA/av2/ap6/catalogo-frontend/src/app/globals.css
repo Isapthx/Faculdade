@@ -1,0 +1,13 @@
+@import "tailwindcss";
+/* Ou se o Next.js gerou no padrão antigo (dependendo da versão exata):
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+*/
+
+/* Opcional: Um toque rápido para garantir boa rolagem no smartphone */
+html, body {
+  overflow-x: hidden;
+  background-color: #f3f4f6; /* Um fundo cinza bem claro, ótimo para cartões de produtos */
+  color: #1f2937;
+}

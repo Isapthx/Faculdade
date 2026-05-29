@@ -11,16 +11,14 @@ public record VitrineDTO(
         List<CategoriaDTO> categorias
 ) {
     public static VitrineDTO de(Empresa e) {
-        List<CategoriaDTO> categorias = e.getCategorias().stream()
-                .map(CategoriaDTO::de)
-                .toList();
-
         return new VitrineDTO(
                 e.getId(),
                 e.getNome(),
                 e.getSlug(),
                 e.getWhatsapp(),
-                categorias
+                e.getCategorias().stream()
+                        .map(CategoriaDTO::de)
+                        .toList()
         );
     }
 }

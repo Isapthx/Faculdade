@@ -1,14 +1,13 @@
 from pydantic import BaseModel
 
-class VendaCreate(BaseModel):
-    usuario_id: int
-    cliente_id: int | None = None
-    forma_pagamento: str
-
-
 class ItemVendaCreate(BaseModel):
     produto_id: int
     quantidade: int
+    preco_unitario: float
+
+class VendaCreate(BaseModel):
+    cliente_id: int | None = None
+    itens: list[ItemVendaCreate]
 
 class RemoverItemVenda(BaseModel):
     quantidade: int

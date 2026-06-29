@@ -22,46 +22,55 @@ router = APIRouter(
     prefix="/vendas",
     tags=["Vendas"]
 )
-
 @router.post("/")
-def criar_venda(
-    venda: VendaCreate,
-    db: Session = Depends(get_db)
-):
-
-    usuario = db.query(Usuario).filter(
-        Usuario.id == venda.usuario_id
-    ).first()
-
-    if not usuario:
-        raise HTTPException(
-            status_code=404,
-            detail="Usuário não encontrado"
-        )
-
+def criar_venda(venda: VendaCreate, db: Session = Depends(get_db)):
     if venda.cliente_id:
-
-        cliente = db.query(Cliente).filter(
-            Cliente.id == venda.cliente_id
-        ).first()
-
+        cliente = db.query(Cliente).filter(Cliente.id == venda.cliente_id).first()
         if not cliente:
-            raise HTTPException(
-                status_code=404,
-                detail="Cliente não encontrado"
-            )
+            raise HTTPException(status_code=404, detail="Cliente não encontrado")
 
     nova_venda = Venda(
-        usuario_id=venda.usuario_id,
         cliente_id=venda.cliente_id,
-        forma_pagamento=venda.forma_pagamento
+        usuario_id=None,
+        valor_total=0
     )
-
     db.add(nova_venda)
     db.commit()
     db.refresh(nova_venda)
 
-    return nova_venda
+    valor_total = 0
+    for item in venda.itens:
+        produto = db.query(Produto).filter(Produto.id == item.produto_id).first()
+        if not produto:
+            raise HTTPException(status_code=404, detail=f"Produto #{item.produto_id} não encontrado")
+        if not produto.ativo:
+            raise HTTPException(status_code=400, detail=f"Produto {produto.nome} está inativo")
+        if produto.estoque_atual < item.quantidade:
+            raise HTTPException(status_code=400, detail=f"Estoque insuficiente para {produto.nome}")
+
+        subtotal = item.preco_unitario * item.quantidade
+        novo_item = ItemVenda(
+            venda_id=nova_venda.id,
+            produto_id=item.produto_id,
+            quantidade=item.quantidade,
+            preco_unitario=item.preco_unitario,
+            subtotal=subtotal
+        )
+        db.add(novo_item)
+        produto.estoque_atual -= item.quantidade
+        valor_total += subtotal
+
+    nova_venda.valor_total = valor_total
+    nova_venda.status = "FINALIZADA"
+    db.commit()
+    db.refresh(nova_venda)
+
+    return {
+        "id": nova_venda.id,
+        "cliente_id": nova_venda.cliente_id,
+        "valor_total": nova_venda.valor_total,
+        "status": nova_venda.status,
+    }
 
 @router.post("/{venda_id}/itens")
 def adicionar_item(

@@ -9,9 +9,7 @@ import {
 } from "lucide-react";
 
 /* ============================================================
-   CONFIGURAÇÃO CENTRAL — ajuste aqui se as rotas reais do seu
-   backend tiverem nomes diferentes. Tudo no app referencia
-   somente este objeto, então é o único lugar a editar.
+   CONFIGURAÇÃO CENTRAL —
    ============================================================ */
 const ENDPOINTS = {
   clientes: "/clientes",
@@ -60,8 +58,6 @@ function daysAgoISO(n) {
   return d.toISOString().slice(0, 10);
 }
 
-// Tenta achar um array de itens dentro de respostas que podem vir como
-// array puro ou como { items: [...] } / { data: [...] } / { results: [...] }
 function coerceList(payload) {
   if (Array.isArray(payload)) return payload;
   if (!payload || typeof payload !== "object") return [];
@@ -408,11 +404,6 @@ function DataTable({ columns, rows, idKey = "id", onEdit, onDelete, searchable, 
   );
 }
 
-/* ============================================================
-   VIEW CRUD GENÉRICA
-   Usada para entidades simples (Categorias, Marcas, Clientes,
-   Usuários, Produtos) a partir de uma configuração declarativa.
-   ============================================================ */
 function SimpleCrudView({
   client, toast, endpoint, title, subtitle, icon: Icon,
   fields, columns, idKey = "id", initialForm,
@@ -445,9 +436,6 @@ function SimpleCrudView({
 
   useEffect(() => { load(); }, [load]);
 
-  // Carrega listas para campos do tipo "select" que dependem de outro endpoint.
-  // A chave é derivada do conteúdo (não da referência do array) para não refazer
-  // o fetch a cada re-render do componente pai.
   const optionEndpointsKey = fields.filter((f) => f.optionsEndpoint).map((f) => `${f.name}:${f.optionsEndpoint}`).join("|");
   useEffect(() => {
     const selectFields = fields.filter((f) => f.optionsEndpoint);
@@ -464,8 +452,7 @@ function SimpleCrudView({
       }
       setOptionLists(next);
     })();
-  }, [client, optionEndpointsKey]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  }, [client, optionEndpointsKey]); 
   function openCreate() {
     setEditing(null);
     setForm(initialForm || {});
@@ -1082,7 +1069,7 @@ function ItemsEditor({ produtos, items, setItems }) {
   );
 }
 /* ============================================================
-   VENDAS — substitua a função VendasView inteira no seu App.jsx
+   VENDAS 
    ============================================================ */
 function VendasView({ client, toast }) {
   const [rows, setRows] = useState([]);
@@ -1430,10 +1417,6 @@ function DashboardView({ client, toast }) {
     </div>
   );
 }
-
-/* ============================================================
-   RELATÓRIOS
-   ============================================================ */
 /* ============================================================
    CONFIGURAÇÃO DA API
    ============================================================ */

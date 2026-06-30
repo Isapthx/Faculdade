@@ -15,20 +15,28 @@ def dashboard(db: Session = Depends(get_db)):
     total_produtos = db.query(Produto).count()
     produtos_ativos = db.query(Produto).filter(Produto.ativo == True).count()
     total_clientes = db.query(Cliente).count()
-    vendas_hoje = db.query(Venda).filter(
-        func.date(Venda.data_venda) == date.today()
-    ).count()
-    faturamento_hoje = db.query(
-        func.coalesce(func.sum(Venda.valor_total), 0)
-    ).filter(func.date(Venda.data_venda) == date.today()).scalar()
-    estoque_baixo = db.query(Produto).filter(
-        Produto.estoque_atual <= 5, Produto.ativo == True
-    ).count()
     total_vendas = db.query(Venda).count()
+
     faturamento_total = db.query(
         func.coalesce(func.sum(Venda.valor_total), 0)
     ).scalar()
+
+    vendas_hoje = db.query(Venda).filter(
+        func.date(Venda.data_venda) == date.today()
+    ).count()
+
+    faturamento_hoje = db.query(
+        func.coalesce(func.sum(Venda.valor_total), 0)
+    ).filter(func.date(Venda.data_venda) == date.today()).scalar()
+
+    estoque_baixo = db.query(Produto).filter(
+        Produto.ativo == True,
+        Produto.estoque_atual > 0,
+        Produto.estoque_atual <= Produto.estoque_minimo
+    ).count()
+
     produtos_sem_estoque = db.query(Produto).filter(
+        Produto.ativo == True,
         Produto.estoque_atual == 0
     ).count()
 

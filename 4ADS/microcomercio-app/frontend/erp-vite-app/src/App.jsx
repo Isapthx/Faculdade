@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
-  LayoutDashboard, Tag, Bookmark, Users, UserCog, Boxes, ShoppingCart,
-  Receipt, FileBarChart, Settings, Plus, Pencil, Trash2, X, Check,
+  LayoutDashboard, Tag, Bookmark, Users, Boxes,
+  Receipt, Settings, Plus, Pencil, Trash2, X, Check,
   AlertTriangle, RefreshCw, ChevronDown, Package,
   Search, Loader2, CircleAlert, BookOpen, Stamp,
-  TrendingUp, Wallet, PackageX, CalendarRange,
+  Wallet, PackageX,
   Menu, ArrowRight, Inbox, Link2, CheckCircle2, XCircle
 } from "lucide-react";
 
@@ -14,20 +14,13 @@ import {
    somente este objeto, então é o único lugar a editar.
    ============================================================ */
 const ENDPOINTS = {
-  usuarios: "/usuarios",
   clientes: "/clientes",
   categorias: "/categorias",
   marcas: "/marcas",
   produtos: "/produtos",
   estoque: "/estoque",
-  compras: "/compras",
   vendas: "/vendas",
   dashboard: "/dashboard",
-  relatorioVendas: "/relatorios/vendas",
-  relatorioCompras: "/relatorios/compras",
-  relatorioMaisVendidos: "/relatorios/produtos-mais-vendidos",
-  relatorioFaturamento: "/relatorios/faturamento",
-  relatorioEstoque: "/relatorios/estoque",
 };
 
 /* ============================================================
@@ -756,51 +749,6 @@ function ClientesView({ client, toast }) {
     />
   );
 }
-
-/* ============================================================
-   USUÁRIOS
-   ============================================================ */
-function UsuariosView({ client, toast }) {
-  return (
-    <SimpleCrudView
-      client={client}
-      toast={toast}
-      endpoint={ENDPOINTS.usuarios}
-      title="Usuários"
-      subtitle="Operadores responsáveis por compras e vendas"
-      icon={UserCog}
-      initialForm={{ nome: "", email: "", senha: "", ativo: true }}
-      fields={[
-        { name: "nome", label: "Nome", required: true },
-        { name: "email", label: "E-mail", type: "email", required: true },
-        { name: "senha", label: "Senha", type: "password", hint: "preenchido apenas no cadastro", placeholder: "••••••••" },
-        { name: "ativo", label: "Situação", type: "checkbox", checkboxLabel: "Usuário ativo" },
-      ]}
-      beforeSubmit={(payload, editing) => {
-        // Evita reenviar senha vazia em edições
-        if (editing && !payload.senha) {
-          const { senha, ...rest } = payload;
-          return rest;
-        }
-        return payload;
-      }}
-      columns={[
-        { key: "id", label: "#", mono: true },
-        { key: "nome", label: "Nome" },
-        { key: "email", label: "E-mail" },
-        {
-          key: "ativo", label: "Situação",
-          render: (r) => (r.ativo === false
-            ? <StampBadge tone="bad">Inativo</StampBadge>
-            : <StampBadge tone="good">Ativo</StampBadge>),
-        },
-      ]}
-      emptyTitle="Nenhum usuário cadastrado"
-      emptyHint="Usuários ficam vinculados como responsáveis por compras e vendas no sistema."
-    />
-  );
-}
-
 /* ============================================================
    PRODUTOS
    ============================================================ */
@@ -813,7 +761,7 @@ function ProdutosView({ client, toast }) {
       title="Produtos"
       subtitle="Catálogo vinculado a categoria, marca e estoque"
       icon={Package}
-      initialForm={{ nome: "", descricao: "", preco: "", categoria_id: "", marca_id: "", ativo: true }}
+      initialForm={{ nome: "", descricao: "", preco: "", categoria_id: "", marca_id: "", estoque_minimo: 0, ativo: true }}
       fields={[
         { name: "nome", label: "Nome", required: true, placeholder: "Ex.: Refrigerante 2L" },
         { name: "descricao", label: "Descrição", type: "textarea" },
@@ -828,6 +776,7 @@ function ProdutosView({ client, toast }) {
           optionsEndpoint: ENDPOINTS.marcas, optionLabel: "nome", optionValue: "id",
           placeholder: "Selecione a marca…",
         },
+        { name: "estoque_minimo", label: "Estoque mínimo", type: "number", step: "1", min: "0", placeholder: "0", hint: "alerta de estoque baixo" },
         { name: "ativo", label: "Situação", type: "checkbox", checkboxLabel: "Produto ativo" },
       ]}
       columns={[
@@ -1132,169 +1081,8 @@ function ItemsEditor({ produtos, items, setItems }) {
     </div>
   );
 }
-
 /* ============================================================
-   COMPRAS
-   ============================================================ */
-function ComprasView({ client, toast }) {
-  const [rows, setRows] = useState([]);
-  const [produtos, setProdutos] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [detailRow, setDetailRow] = useState(null);
-  const [saving, setSaving] = useState(false);
-
-  const [fornecedor, setFornecedor] = useState("");
-  const [usuarioId, setUsuarioId] = useState("");
-  const [items, setItems] = useState([]);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [compras, prods, users] = await Promise.all([
-        client.get(ENDPOINTS.compras),
-        client.get(ENDPOINTS.produtos).catch(() => []),
-        client.get(ENDPOINTS.usuarios).catch(() => []),
-      ]);
-      setRows(coerceList(compras));
-      setProdutos(coerceList(prods));
-      setUsuarios(coerceList(users));
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [client]);
-
-  useEffect(() => { load(); }, [load]);
-
-  function openCreate() {
-    setFornecedor("");
-    setUsuarioId("");
-    setItems([]);
-    setModalOpen(true);
-  }
-
-  async function submit(e) {
-    e.preventDefault();
-    if (items.length === 0) { toast("error", "Adicione ao menos um item à compra."); return; }
-    setSaving(true);
-    try {
-      const payload = {
-        fornecedor: fornecedor || undefined,
-        usuario_id: usuarioId ? Number(usuarioId) : undefined,
-        itens: items.map((it) => ({
-          produto_id: Number(it.produto_id),
-          quantidade: Number(it.quantidade),
-          preco_unitario: Number(it.preco_unitario),
-        })),
-      };
-      await client.post(ENDPOINTS.compras, payload);
-      toast("success", "Compra registrada — o estoque dos itens foi atualizado.");
-      setModalOpen(false);
-      load();
-    } catch (err) {
-      toast("error", err.message);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const totalDe = (c) => {
-    const direto = pick(c, ["total", "valor_total"], null);
-    if (direto !== null) return Number(direto);
-    const itens = coerceList(pick(c, ["itens", "items"], []));
-    return itens.reduce((s, it) => s + (Number(pick(it, ["quantidade"], 0)) * Number(pick(it, ["preco_unitario"], 0))), 0);
-  };
-
-  return (
-    <div>
-      <ViewHeader icon={ShoppingCart} title="Compras" subtitle="Entradas de mercadoria — alimentam o estoque automaticamente" count={rows.length}>
-        <Button variant="outline" size="sm" onClick={load}><RefreshCw size={14} /></Button>
-        <Button size="sm" onClick={openCreate}><Plus size={15} /> Nova compra</Button>
-      </ViewHeader>
-
-      {loading ? (
-        <LoadingBlock />
-      ) : error ? (
-        <ErrorBlock message={error} onRetry={load} />
-      ) : (
-        <DataTable
-          rows={rows}
-          searchable
-          emptyTitle="Nenhuma compra registrada"
-          emptyHint="Registre uma compra para dar entrada de produtos no estoque."
-          onEdit={(row) => setDetailRow(row)}
-          columns={[
-            { key: "id", label: "#", mono: true },
-            { key: "data", label: "Data", render: (r) => formatDate(pick(r, ["data", "criado_em", "created_at"], null)) },
-            { key: "fornecedor", label: "Fornecedor", render: (r) => r.fornecedor || "—" },
-            { key: "usuario_nome", label: "Responsável", render: (r) => pick(r, ["usuario_nome", "usuario"], "—") },
-            { key: "total", label: "Total", mono: true, render: (r) => formatCurrency(totalDe(r)) },
-          ]}
-        />
-      )}
-
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nova compra" subtitle="Itens cadastrados entram automaticamente no estoque" width="max-w-3xl">
-        <form onSubmit={submit} className="flex flex-col gap-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label="Fornecedor" hint="opcional">
-              <TextInput value={fornecedor} onChange={(e) => setFornecedor(e.target.value)} placeholder="Nome do fornecedor" />
-            </Field>
-            <Field label="Responsável">
-              <SelectInput value={usuarioId} onChange={(e) => setUsuarioId(e.target.value)}>
-                <option value="">Selecione…</option>
-                {usuarios.map((u) => <option key={u.id} value={u.id}>{u.nome}</option>)}
-              </SelectInput>
-            </Field>
-          </div>
-          <ItemsEditor produtos={produtos} items={items} setItems={setItems} />
-          <div className="mt-2 flex justify-end gap-2 border-t border-zinc-100 pt-3">
-            <Button type="button" variant="ghost" size="sm" onClick={() => setModalOpen(false)}>Cancelar</Button>
-            <Button type="submit" size="sm" disabled={saving}>
-              {saving ? <Spinner className="h-3.5 w-3.5" /> : <Check size={15} />} Registrar compra
-            </Button>
-          </div>
-        </form>
-      </Modal>
-
-      <Modal open={!!detailRow} onClose={() => setDetailRow(null)} title={`Compra #${detailRow?.id ?? ""}`} subtitle={detailRow ? formatDate(pick(detailRow, ["data"], null)) : ""} width="max-w-2xl">
-        {detailRow && (
-          <div className="flex flex-col gap-3">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <p><span className="text-zinc-500">Fornecedor: </span>{detailRow.fornecedor || "—"}</p>
-              <p><span className="text-zinc-500">Responsável: </span>{pick(detailRow, ["usuario_nome", "usuario"], "—")}</p>
-            </div>
-            <div className="overflow-hidden rounded-lg border border-zinc-200">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500">
-                  <tr><th className="px-3 py-2">Produto</th><th className="px-3 py-2">Qtd.</th><th className="px-3 py-2">Preço unit.</th><th className="px-3 py-2">Subtotal</th></tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100">
-                  {coerceList(pick(detailRow, ["itens", "items"], [])).map((it, idx) => (
-                    <tr key={idx}>
-                      <td className="px-3 py-2">{pick(it, ["produto_nome", "produto"], `#${it.produto_id}`)}</td>
-                      <td className="px-3 py-2 font-mono">{pick(it, ["quantidade"], "—")}</td>
-                      <td className="px-3 py-2 font-mono">{formatCurrency(pick(it, ["preco_unitario"], 0))}</td>
-                      <td className="px-3 py-2 font-mono">{formatCurrency(Number(pick(it, ["quantidade"], 0)) * Number(pick(it, ["preco_unitario"], 0)))}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-right font-mono text-base font-bold">{formatCurrency(totalDe(detailRow))}</p>
-          </div>
-        )}
-      </Modal>
-    </div>
-  );
-}
-
-/* ============================================================
-   VENDAS
+   VENDAS — substitua a função VendasView inteira no seu App.jsx
    ============================================================ */
 function VendasView({ client, toast }) {
   const [rows, setRows] = useState([]);
@@ -1302,12 +1090,29 @@ function VendasView({ client, toast }) {
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [detailRow, setDetailRow] = useState(null);
-  const [saving, setSaving] = useState(false);
 
+  // Modal criar
+  const [modalOpen, setModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [clienteId, setClienteId] = useState("");
+  const [formaPagamento, setFormaPagamento] = useState("dinheiro");
   const [items, setItems] = useState([]);
+
+  // Modal editar
+  const [editRow, setEditRow] = useState(null);
+  const [editCliente, setEditCliente] = useState("");
+  const [editForma, setEditForma] = useState("dinheiro");
+  const [editItems, setEditItems] = useState([]);
+  const [editSaving, setEditSaving] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+
+  const FORMAS = [
+    { value: "dinheiro", label: "💵 Dinheiro" },
+    { value: "cartao",   label: "💳 Cartão"   },
+    { value: "pix",      label: "📱 Pix"      },
+  ];
+
+  const formaLabel = (v) => FORMAS.find((f) => f.value === v)?.label ?? v ?? "—";
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -1330,27 +1135,29 @@ function VendasView({ client, toast }) {
 
   useEffect(() => { load(); }, [load]);
 
+  // ── Criar ────────────────────────────────────────────────────
   function openCreate() {
     setClienteId("");
+    setFormaPagamento("dinheiro");
     setItems([]);
     setModalOpen(true);
   }
 
-  async function submit(e) {
+  async function submitCreate(e) {
     e.preventDefault();
     if (items.length === 0) { toast("error", "Adicione ao menos um item à venda."); return; }
     setSaving(true);
     try {
-      const payload = {
+      await client.post(ENDPOINTS.vendas, {
         cliente_id: clienteId ? Number(clienteId) : null,
+        forma_pagamento: formaPagamento,
         itens: items.map((it) => ({
           produto_id: Number(it.produto_id),
           quantidade: Number(it.quantidade),
           preco_unitario: Number(it.preco_unitario),
         })),
-      };
-      await client.post(ENDPOINTS.vendas, payload);
-      toast("success", "Venda registrada — o estoque dos itens foi atualizado.");
+      });
+      toast("success", "Venda registrada — estoque atualizado.");
       setModalOpen(false);
       load();
     } catch (err) {
@@ -1360,16 +1167,81 @@ function VendasView({ client, toast }) {
     }
   }
 
+  // ── Editar ────────────────────────────────────────────────────
+  // Abre o modal de edição e busca os itens atuais da venda do backend
+  async function openEdit(row) {
+    setEditRow(row);
+    setEditCliente(String(row.cliente_id ?? ""));
+    setEditForma(row.forma_pagamento ?? "dinheiro");
+    setEditItems([]);
+    setLoadingEdit(true);
+
+    try {
+      // Se a listagem já trouxe os itens (novo _build_response), usa direto
+      const itensExistentes = coerceList(pick(row, ["itens", "items"], []));
+      if (itensExistentes.length > 0) {
+        setEditItems(itensExistentes.map((it) => ({
+          produto_id: String(it.produto_id),
+          quantidade: it.quantidade,
+          preco_unitario: it.preco_unitario,
+        })));
+      } else {
+        // Fallback: busca do endpoint de itens
+        const itens = await client.get(`${ENDPOINTS.vendas}/${row.id}/itens`);
+        setEditItems(coerceList(itens).map((it) => ({
+          produto_id: String(it.produto_id),
+          quantidade: it.quantidade,
+          preco_unitario: it.preco_unitario,
+        })));
+      }
+    } catch {
+      toast("error", "Não foi possível carregar os itens da venda.");
+    } finally {
+      setLoadingEdit(false);
+    }
+  }
+
+  async function submitEdit(e) {
+    e.preventDefault();
+    if (!editRow) return;
+    if (editItems.length === 0) { toast("error", "A venda precisa ter ao menos um item."); return; }
+    setEditSaving(true);
+    try {
+      await client.put(`${ENDPOINTS.vendas}/${editRow.id}`, {
+        cliente_id: editCliente ? Number(editCliente) : null,
+        forma_pagamento: editForma,
+        itens: editItems.map((it) => ({
+          produto_id: Number(it.produto_id),
+          quantidade: Number(it.quantidade),
+          preco_unitario: Number(it.preco_unitario),
+        })),
+      });
+      toast("success", "Venda atualizada com sucesso.");
+      setEditRow(null);
+      load();
+    } catch (err) {
+      toast("error", err.message);
+    } finally {
+      setEditSaving(false);
+    }
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────
   const totalDe = (v) => {
     const direto = pick(v, ["total", "valor_total"], null);
     if (direto !== null) return Number(direto);
-    const itens = coerceList(pick(v, ["itens", "items"], []));
-    return itens.reduce((s, it) => s + (Number(pick(it, ["quantidade"], 0)) * Number(pick(it, ["preco_unitario"], 0))), 0);
+    return coerceList(pick(v, ["itens", "items"], []))
+      .reduce((s, it) => s + Number(pick(it, ["quantidade"], 0)) * Number(pick(it, ["preco_unitario"], 0)), 0);
   };
 
   return (
     <div>
-      <ViewHeader icon={Receipt} title="Vendas" subtitle="Saídas de mercadoria — reduzem o estoque automaticamente" count={rows.length}>
+      <ViewHeader
+        icon={Receipt}
+        title="Vendas"
+        subtitle="Saídas de mercadoria — reduzem o estoque automaticamente"
+        count={rows.length}
+      >
         <Button variant="outline" size="sm" onClick={load}><RefreshCw size={14} /></Button>
         <Button size="sm" onClick={openCreate}><Plus size={15} /> Nova venda</Button>
       </ViewHeader>
@@ -1384,24 +1256,55 @@ function VendasView({ client, toast }) {
           searchable
           emptyTitle="Nenhuma venda registrada"
           emptyHint="Registre a primeira venda para movimentar o estoque e o caixa."
-          onEdit={(row) => setDetailRow(row)}
+          onEdit={openEdit}
           columns={[
             { key: "id", label: "#", mono: true },
-            { key: "data", label: "Data", render: (r) => formatDate(pick(r, ["data", "data_venda", "criado_em", "created_at"], null)) },
-            { key: "cliente_nome", label: "Cliente", render: (r) => pick(r, ["cliente_nome", "cliente"], "Consumidor não identificado") },
-            { key: "total", label: "Total", mono: true, render: (r) => formatCurrency(totalDe(r)) },
+            {
+              key: "data_venda", label: "Data",
+              render: (r) => formatDate(pick(r, ["data", "data_venda", "criado_em"], null)),
+            },
+            {
+              key: "cliente_nome", label: "Cliente",
+              render: (r) => pick(r, ["cliente_nome", "cliente"], "Consumidor não identificado"),
+            },
+            {
+              key: "forma_pagamento", label: "Pagamento",
+              render: (r) => {
+                const v = r.forma_pagamento;
+                const tone = v === "dinheiro" ? "good" : v === "pix" ? "neutral" : "warn";
+                return <StampBadge tone={tone}>{formaLabel(v)}</StampBadge>;
+              },
+            },
+            {
+              key: "valor_total", label: "Total", mono: true,
+              render: (r) => formatCurrency(totalDe(r)),
+            },
           ]}
         />
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nova venda" subtitle="O estoque é debitado automaticamente ao registrar" width="max-w-3xl">
-        <form onSubmit={submit} className="flex flex-col gap-3">
-          <Field label="Cliente" hint="opcional — venda avulsa permitida">
-            <SelectInput value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
-              <option value="">Consumidor não identificado</option>
-              {clientes.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-            </SelectInput>
-          </Field>
+      {/* ── Modal: Nova venda ── */}
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Nova venda"
+        subtitle="O estoque é debitado automaticamente ao registrar"
+        width="max-w-3xl"
+      >
+        <form onSubmit={submitCreate} className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Cliente" hint="opcional">
+              <SelectInput value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
+                <option value="">Consumidor não identificado</option>
+                {clientes.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+              </SelectInput>
+            </Field>
+            <Field label="Forma de pagamento" required>
+              <SelectInput value={formaPagamento} onChange={(e) => setFormaPagamento(e.target.value)}>
+                {FORMAS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </SelectInput>
+            </Field>
+          </div>
           <ItemsEditor produtos={produtos} items={items} setItems={setItems} />
           <div className="mt-2 flex justify-end gap-2 border-t border-zinc-100 pt-3">
             <Button type="button" variant="ghost" size="sm" onClick={() => setModalOpen(false)}>Cancelar</Button>
@@ -1412,31 +1315,45 @@ function VendasView({ client, toast }) {
         </form>
       </Modal>
 
-      <Modal open={!!detailRow} onClose={() => setDetailRow(null)} title={`Venda #${detailRow?.id ?? ""}`} subtitle={detailRow ? formatDate(pick(detailRow, ["data", "data_venda"], null)) : ""} width="max-w-2xl">
-        {detailRow && (
-          <div className="flex flex-col gap-3">
-            <div className="text-sm">
-              <p><span className="text-zinc-500">Cliente: </span>{pick(detailRow, ["cliente_nome", "cliente"], "Consumidor não identificado")}</p>
+      {/* ── Modal: Editar venda ── */}
+      <Modal
+        open={!!editRow}
+        onClose={() => setEditRow(null)}
+        title={`Editar Venda #${editRow?.id ?? ""}`}
+        subtitle="Alterações no estoque são recalculadas automaticamente"
+        width="max-w-3xl"
+      >
+        {loadingEdit ? (
+          <LoadingBlock label="Carregando itens da venda…" />
+        ) : (
+          <form onSubmit={submitEdit} className="flex flex-col gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Cliente" hint="opcional">
+                <SelectInput value={editCliente} onChange={(e) => setEditCliente(e.target.value)}>
+                  <option value="">Consumidor não identificado</option>
+                  {clientes.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                </SelectInput>
+              </Field>
+              <Field label="Forma de pagamento" required>
+                <SelectInput value={editForma} onChange={(e) => setEditForma(e.target.value)}>
+                  {FORMAS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+                </SelectInput>
+              </Field>
             </div>
-            <div className="overflow-hidden rounded-lg border border-zinc-200">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500">
-                  <tr><th className="px-3 py-2">Produto</th><th className="px-3 py-2">Qtd.</th><th className="px-3 py-2">Preço unit.</th><th className="px-3 py-2">Subtotal</th></tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100">
-                  {coerceList(pick(detailRow, ["itens", "items"], [])).map((it, idx) => (
-                    <tr key={idx}>
-                      <td className="px-3 py-2">{pick(it, ["produto_nome", "produto"], `#${it.produto_id}`)}</td>
-                      <td className="px-3 py-2 font-mono">{pick(it, ["quantidade"], "—")}</td>
-                      <td className="px-3 py-2 font-mono">{formatCurrency(pick(it, ["preco_unitario"], 0))}</td>
-                      <td className="px-3 py-2 font-mono">{formatCurrency(Number(pick(it, ["quantidade"], 0)) * Number(pick(it, ["preco_unitario"], 0)))}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+
+            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              ⚠️ Ao salvar, o estoque dos itens antigos é devolvido e os novos são debitados.
             </div>
-            <p className="text-right font-mono text-base font-bold">{formatCurrency(totalDe(detailRow))}</p>
-          </div>
+
+            <ItemsEditor produtos={produtos} items={editItems} setItems={setEditItems} />
+
+            <div className="mt-2 flex justify-end gap-2 border-t border-zinc-100 pt-3">
+              <Button type="button" variant="ghost" size="sm" onClick={() => setEditRow(null)}>Cancelar</Button>
+              <Button type="submit" size="sm" disabled={editSaving}>
+                {editSaving ? <Spinner className="h-3.5 w-3.5" /> : <Check size={15} />} Salvar alterações
+              </Button>
+            </div>
+          </form>
         )}
       </Modal>
     </div>
@@ -1501,25 +1418,15 @@ function DashboardView({ client, toast }) {
       ) : error ? (
         <ErrorBlock message={error} onRetry={load} />
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3">
           <KpiCard icon={Package} label="Produtos cadastrados" value={countOf(pick(data, ["total_produtos", "produtos"], "—"))} />
           <KpiCard icon={Users} label="Clientes" value={countOf(pick(data, ["total_clientes", "clientes"], "—"))} />
           <KpiCard icon={Receipt} label="Vendas realizadas" value={countOf(pick(data, ["total_vendas", "vendas"], "—"))} />
-          <KpiCard icon={Wallet} label="Valor total vendido" value={formatCurrency(pick(data, ["valor_total_vendido", "total_vendido"], 0))} tone="good" />
-          <KpiCard icon={ShoppingCart} label="Valor total comprado" value={formatCurrency(pick(data, ["valor_total_comprado", "total_comprado"], 0))} />
+          <KpiCard icon={Wallet} label="Valor total vendido" value={formatCurrency(pick(data, ["faturamento_total", "valor_total_vendido", "total_vendido"], 0))} tone="good" />
           <KpiCard icon={AlertTriangle} label="Produtos com estoque baixo" value={countOf(pick(data, ["produtos_estoque_baixo", "estoque_baixo"], "—"))} tone="warn" />
           <KpiCard icon={PackageX} label="Produtos sem estoque" value={countOf(pick(data, ["produtos_sem_estoque", "sem_estoque"], "—"))} tone="bad" />
         </div>
       )}
-
-      <div className="mt-6 flex items-start gap-2 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-4 py-3 text-xs text-zinc-500">
-        <BookOpen size={14} className="mt-0.5 shrink-0" />
-        <p>
-          Estes números vêm diretamente de <code className="rounded bg-zinc-200 px-1 py-0.5 font-mono">GET {ENDPOINTS.dashboard}</code>.
-          Se algum indicador aparecer com “—”, o nome do campo retornado pela sua API é diferente do esperado —
-          ajuste a função <code className="rounded bg-zinc-200 px-1 py-0.5 font-mono">pick(...)</code> correspondente no código.
-        </p>
-      </div>
     </div>
   );
 }
@@ -1527,135 +1434,6 @@ function DashboardView({ client, toast }) {
 /* ============================================================
    RELATÓRIOS
    ============================================================ */
-const REPORT_TABS = [
-  { id: "vendas", label: "Vendas por período" },
-  { id: "compras", label: "Compras por período" },
-  { id: "maisVendidos", label: "Produtos mais vendidos" },
-  { id: "faturamento", label: "Faturamento" },
-  { id: "estoque", label: "Situação do estoque" },
-];
-
-function RelatoriosView({ client, toast }) {
-  const [tab, setTab] = useState("vendas");
-  const [inicio, setInicio] = useState(daysAgoISO(30));
-  const [fim, setFim] = useState(todayISO());
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [result, setResult] = useState(null);
-  const needsRange = tab !== "estoque";
-
-  const run = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setResult(null);
-    try {
-      const qs = `?data_inicio=${inicio}&data_fim=${fim}`;
-      let endpoint;
-      if (tab === "vendas") endpoint = ENDPOINTS.relatorioVendas + qs;
-      else if (tab === "compras") endpoint = ENDPOINTS.relatorioCompras + qs;
-      else if (tab === "maisVendidos") endpoint = ENDPOINTS.relatorioMaisVendidos + qs;
-      else if (tab === "faturamento") endpoint = ENDPOINTS.relatorioFaturamento + qs;
-      else endpoint = ENDPOINTS.relatorioEstoque;
-      const data = await client.get(endpoint);
-      setResult(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [client, tab, inicio, fim]);
-
-  useEffect(() => { run(); }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const list = coerceList(result);
-
-  return (
-    <div>
-      <ViewHeader icon={FileBarChart} title="Relatórios" subtitle="Consultas consolidadas sobre vendas, compras e estoque" />
-
-      <div className="mb-4 flex flex-wrap gap-1 border-b border-zinc-200">
-        {REPORT_TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={cx(
-              "border-b-2 px-3 py-2 text-sm font-medium transition-colors",
-              tab === t.id ? "border-amber-700 text-amber-800" : "border-transparent text-zinc-500 hover:text-zinc-800"
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {needsRange && (
-        <div className="mb-4 flex flex-wrap items-end gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
-          <Field label="De">
-            <input type="date" value={inicio} onChange={(e) => setInicio(e.target.value)} className={inputBase} />
-          </Field>
-          <Field label="Até">
-            <input type="date" value={fim} onChange={(e) => setFim(e.target.value)} className={inputBase} />
-          </Field>
-          <Button size="sm" onClick={run}><CalendarRange size={14} /> Gerar relatório</Button>
-        </div>
-      )}
-
-      {loading ? (
-        <LoadingBlock label="Gerando relatório…" />
-      ) : error ? (
-        <ErrorBlock message={error} onRetry={run} />
-      ) : tab === "faturamento" && result && !Array.isArray(result) ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <KpiCard icon={Wallet} label="Faturamento (vendido)" value={formatCurrency(pick(result, ["valor_total_vendido", "faturamento", "total_vendido"], 0))} tone="good" />
-          <KpiCard icon={ShoppingCart} label="Total comprado" value={formatCurrency(pick(result, ["valor_total_comprado", "total_comprado"], 0))} />
-          <KpiCard icon={TrendingUp} label="Resultado" value={formatCurrency(pick(result, ["resultado", "saldo"], Number(pick(result, ["valor_total_vendido", "faturamento", "total_vendido"], 0)) - Number(pick(result, ["valor_total_comprado", "total_comprado"], 0))))} />
-        </div>
-      ) : list.length === 0 ? (
-        <EmptyState title="Sem dados para o período selecionado" hint="Ajuste o intervalo de datas e gere o relatório novamente." />
-      ) : tab === "maisVendidos" ? (
-        <DataTable
-          rows={list}
-          columns={[
-            { key: "produto_nome", label: "Produto", render: (r) => pick(r, ["produto_nome", "produto", "nome"], "—") },
-            { key: "quantidade_vendida", label: "Qtd. vendida", mono: true, render: (r) => pick(r, ["quantidade_vendida", "quantidade", "total_vendido"], "—") },
-            { key: "valor_total", label: "Valor total", mono: true, render: (r) => formatCurrency(pick(r, ["valor_total", "total"], 0)) },
-          ]}
-        />
-      ) : tab === "estoque" ? (
-        <DataTable
-          rows={list}
-          searchable
-          columns={[
-            { key: "produto_nome", label: "Produto", render: (r) => pick(r, ["produto_nome", "produto", "nome"], "—") },
-            { key: "quantidade", label: "Quantidade", mono: true, render: (r) => pick(r, ["quantidade", "qtd"], "—") },
-            {
-              key: "status", label: "Situação",
-              render: (r) => {
-                const qtd = Number(pick(r, ["quantidade", "qtd"], 0));
-                if (qtd <= 0) return <StampBadge tone="bad">Sem estoque</StampBadge>;
-                return <StampBadge tone="good">Normal</StampBadge>;
-              },
-            },
-          ]}
-        />
-      ) : (
-        // vendas / compras por período
-        <DataTable
-          rows={list}
-          columns={[
-            { key: "id", label: "#", mono: true },
-            { key: "data", label: "Data", render: (r) => formatDate(pick(r, ["data"], null)) },
-            tab === "vendas"
-              ? { key: "cliente_nome", label: "Cliente", render: (r) => pick(r, ["cliente_nome", "cliente"], "Consumidor não identificado") }
-              : { key: "fornecedor", label: "Fornecedor", render: (r) => r.fornecedor || "—" },
-            { key: "total", label: "Total", mono: true, render: (r) => formatCurrency(pick(r, ["total", "valor_total"], 0)) },
-          ]}
-        />
-      )}
-    </div>
-  );
-}
-
 /* ============================================================
    CONFIGURAÇÃO DA API
    ============================================================ */
@@ -1762,7 +1540,6 @@ const NAV_SECTIONS = [
   {
     title: "Movimento",
     items: [
-      { id: "compras", label: "Compras", icon: ShoppingCart },
       { id: "vendas", label: "Vendas", icon: Receipt },
     ],
   },
@@ -1770,12 +1547,7 @@ const NAV_SECTIONS = [
     title: "Cadastros",
     items: [
       { id: "clientes", label: "Clientes", icon: Users },
-      { id: "usuarios", label: "Usuários", icon: UserCog },
     ],
-  },
-  {
-    title: "Análise",
-    items: [{ id: "relatorios", label: "Relatórios", icon: FileBarChart }],
   },
 ];
 
@@ -1848,8 +1620,18 @@ function Sidebar({ current, onNavigate, mobileOpen, onCloseMobile }) {
   );
 }
 
-function TopBar({ view, apiBaseUrl, onMenuClick, onOpenConfig }) {
+function TopBar({ view, onMenuClick }) {
   const meta = VIEW_LABELS[view] || { label: view, folio: "000" };
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const hora = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  const data = now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+  const dataCapitalizada = data.charAt(0).toUpperCase() + data.slice(1);
+
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between border-b border-zinc-200 bg-white/90 px-4 py-3 backdrop-blur lg:px-6">
       <div className="flex items-center gap-3">
@@ -1861,14 +1643,10 @@ function TopBar({ view, apiBaseUrl, onMenuClick, onOpenConfig }) {
           <h1 className="font-serif text-base font-semibold text-zinc-900 leading-tight">{meta.label}</h1>
         </div>
       </div>
-      <button
-        onClick={onOpenConfig}
-        className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
-        title="Clique para alterar a URL da API"
-      >
-        <span className={cx("h-1.5 w-1.5 rounded-full", apiBaseUrl ? "bg-emerald-500" : "bg-rose-500")} />
-        <span className="hidden font-mono sm:inline">{apiBaseUrl || "API não configurada"}</span>
-      </button>
+      <div className="text-right">
+        <p className="text-xs text-zinc-500">{dataCapitalizada}</p>
+        <p className="font-mono text-sm font-semibold text-zinc-800">{hora}</p>
+      </div>
     </header>
   );
 }
@@ -1903,11 +1681,8 @@ export default function ERPApp() {
     case "categorias": body = <CategoriasView {...viewProps} />; break;
     case "marcas": body = <MarcasView {...viewProps} />; break;
     case "estoque": body = <EstoqueView {...viewProps} />; break;
-    case "compras": body = <ComprasView {...viewProps} />; break;
     case "vendas": body = <VendasView {...viewProps} />; break;
     case "clientes": body = <ClientesView {...viewProps} />; break;
-    case "usuarios": body = <UsuariosView {...viewProps} />; break;
-    case "relatorios": body = <RelatoriosView {...viewProps} />; break;
     case "configuracoes":
       body = <ConfiguracoesView apiBaseUrl={apiBaseUrl} setApiBaseUrl={setApiBaseUrl} embedded onTested={() => setView("dashboard")} />;
       break;
@@ -1918,7 +1693,7 @@ export default function ERPApp() {
     <div className="flex min-h-screen bg-zinc-100 font-sans text-zinc-900">
       <Sidebar current={view} onNavigate={setView} mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
       <div className="flex min-h-screen flex-1 flex-col lg:pl-0">
-        <TopBar view={view} apiBaseUrl={apiBaseUrl} onMenuClick={() => setMobileOpen(true)} onOpenConfig={() => setView("configuracoes")} />
+        <TopBar view={view} onMenuClick={() => setMobileOpen(true)} />
         <main className="flex-1 px-4 py-5 lg:px-6">{body}</main>
       </div>
       <ToastStack toasts={toasts} onDismiss={dismissToast} />

@@ -1,0 +1,11 @@
+br\com\faeterj\repositorio\controllers\DisciplinaController.class
+br\com\faeterj\repositorio\repositories\LinkUtilRepository.class
+br\com\faeterj\repositorio\controllers\LinkUtilController.class
+br\com\faeterj\repositorio\controllers\TopicoController.class
+br\com\faeterj\repositorio\models\Disciplina.class
+br\com\faeterj\repositorio\RepositorioApplication.class
+br\com\faeterj\repositorio\models\Topico.class
+br\com\faeterj\repositorio\models\LinkUtil.class
+br\com\faeterj\repositorio\models\service\LinkUtilService.class
+br\com\faeterj\repositorio\repositories\TopicoRepository.class
+br\com\faeterj\repositorio\repositories\DisciplinaRepository.class

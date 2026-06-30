@@ -8,7 +8,6 @@ from app.models.produto import Produto
 from app.schemas.produto import ProdutoCreate
 
 router = APIRouter(prefix="/produtos", tags=["Produtos"])
-
 @router.post("/")
 def criar_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
     novo = Produto(
@@ -16,9 +15,10 @@ def criar_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
         descricao=produto.descricao,
         codigo_barras=produto.codigo_barras,
         preco_compra=produto.preco_compra,
-        preco_venda=produto.preco_venda or produto.preco,  # aceita os dois
+        preco_venda=produto.preco_venda or produto.preco,
         categoria_id=produto.categoria_id,
         marca_id=produto.marca_id,
+        estoque_minimo=produto.estoque_minimo or 0,
     )
     db.add(novo)
     db.commit()
@@ -26,20 +26,10 @@ def criar_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
     return novo
 
 @router.put("/{produto_id}")
-def atualizar_produto(
-    produto_id: int,
-    dados: ProdutoCreate,
-    db: Session = Depends(get_db)
-):
-    produto = db.query(Produto).filter(
-        Produto.id == produto_id
-    ).first()
-
+def atualizar_produto(produto_id: int, dados: ProdutoCreate, db: Session = Depends(get_db)):
+    produto = db.query(Produto).filter(Produto.id == produto_id).first()
     if not produto:
-        raise HTTPException(
-            status_code=404,
-            detail="Produto não encontrado"
-        )
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
 
     produto.nome = dados.nome
     produto.descricao = dados.descricao
@@ -48,11 +38,12 @@ def atualizar_produto(
     produto.preco_venda = dados.preco_venda or dados.preco
     produto.categoria_id = dados.categoria_id
     produto.marca_id = dados.marca_id
+    produto.estoque_minimo = dados.estoque_minimo or 0  # ← linha nova
 
     db.commit()
     db.refresh(produto)
-
     return produto
+
 @router.delete("/{produto_id}")
 def deletar_produto(produto_id: int, db: Session = Depends(get_db)):
     produto = db.query(Produto).filter(Produto.id == produto_id).first()

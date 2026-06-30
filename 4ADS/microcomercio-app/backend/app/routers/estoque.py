@@ -11,17 +11,13 @@ router = APIRouter(prefix="/estoque", tags=["Estoque"])
 @router.get("/")
 def listar_estoque(db: Session = Depends(get_db)):
     produtos = db.query(Produto).all()
-    
-    result = []
-    for p in produtos:
-        result.append({
-            "produto_id": p.id,
-            "produto_nome": p.nome,
-            "quantidade": p.estoque_atual,
-            "ativo": p.ativo,
-        })
-    
-    return result
+    return [{
+        "produto_id": p.id,
+        "produto_nome": p.nome,
+        "quantidade": p.estoque_atual,
+        "quantidade_minima": p.estoque_minimo,
+        "ativo": p.ativo,
+    } for p in produtos]
 
 @router.post("/entrada")
 def entrada_estoque(

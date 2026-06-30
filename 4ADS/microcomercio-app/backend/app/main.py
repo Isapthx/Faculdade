@@ -13,7 +13,6 @@ from app.routers import estoque
 from app.routers import vendas
 from app.routers import clientes
 from app.routers import dashboard
-from app.routers import relatorios
 
 Base.metadata.create_all(bind=engine)
 

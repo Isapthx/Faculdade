@@ -12,6 +12,7 @@ class Produto(Base):
     preco_compra = Column(Float)
     preco_venda = Column(Float)
     estoque_atual = Column(Integer, default=0)
+    estoque_minimo = Column(Integer, default=0)  # novo
     ativo = Column(Boolean, default=True)
 
     marca_id = Column(Integer, ForeignKey("marcas.id"))

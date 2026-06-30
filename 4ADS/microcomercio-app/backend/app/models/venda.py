@@ -12,7 +12,7 @@ class Venda(Base):
     usuario_id = Column(
         Integer,
         ForeignKey("usuarios.id"),
-        nullable=False
+        nullable=True
     )
 
     cliente_id = Column(
